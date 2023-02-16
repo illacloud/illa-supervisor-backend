@@ -496,9 +496,11 @@ func (controller *Controller) JoinByLink(c *gin.Context) {
 	}
 
 	// check if now user email does not match invte email
-	if inviteRecord.ExportEmail() != user.ExportEmail() {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_INVITE_EMAIL_MISMATCH, "invite email mismatch.")
-		return
+	if inviteRecord.IsEmailInviteLink() {
+		if inviteRecord.ExportEmail() != user.ExportEmail() {
+			controller.FeedbackInternalServerError(c, ERROR_FLAG_INVITE_EMAIL_MISMATCH, "invite email mismatch.")
+			return
+		}
 	}
 
 	// check if team closed invite by link permission
