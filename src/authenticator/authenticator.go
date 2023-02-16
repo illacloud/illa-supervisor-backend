@@ -58,11 +58,6 @@ func ExtractUserIDFromToken(accessToken string) (int, uuid.UUID, error) {
 }
 
 func (a *Authenticator) ValidateUser(id int, uid uuid.UUID) (bool, error) {
-	// refuse invalied user
-	emptyUUID, _ := uuid.Parse("00000000-0000-0000-0000-000000000000")
-	if id == 0 || uid == emptyUUID {
-		return false, errors.New("invalied user ID or UID.")
-	}
 	// query datasource
 	userRecord, err := a.Storage.UserStorage.RetrieveByIDAndUID(id, uid)
 	if err != nil {
@@ -102,6 +97,7 @@ func CreateAccessToken(id int, uid uuid.UUID) (string, error) {
 func (a *Authenticator) JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		accessToken := c.Request.Header["Authorization"]
+		fmt.Printf("accessToken: %v\n", accessToken)
 		var token string
 		if len(accessToken) != 1 {
 			c.AbortWithStatus(http.StatusUnauthorized)
@@ -109,8 +105,11 @@ func (a *Authenticator) JWTAuth() gin.HandlerFunc {
 			token = accessToken[0]
 		}
 		userID, userUID, extractErr := ExtractUserIDFromToken(token)
+		fmt.Printf("userID: %v, userUID:%v\n", userID, userUID)
 		validAccessToken, validaAccessErr := a.ValidateAccessToken(token)
+		fmt.Printf("validaAccessErr: %v\n", validaAccessErr)
 		validUser, validUserErr := a.ValidateUser(userID, userUID)
+		fmt.Printf("validUserErr: %v\n", validUserErr)
 
 		if validAccessToken && validUser && validaAccessErr == nil && extractErr == nil && validUserErr == nil {
 			c.Set("userID", userID)

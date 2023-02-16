@@ -284,7 +284,7 @@ func (controller *Controller) SignIn(c *gin.Context) {
 
 	// fetch user by email
 	user, err := controller.Storage.UserStorage.RetrieveByEmail(req.Email)
-	if err != nil || user.ID == 0 {
+	if err != nil {
 		controller.FeedbackInternalServerError(c, ERROR_FLAG_SIGN_IN_FAILED, "invalid email or password")
 		return
 	}

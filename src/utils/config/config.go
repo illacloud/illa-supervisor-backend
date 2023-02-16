@@ -15,7 +15,7 @@ const DRIVE_TYPE_MINIO = "minio"
 type Config struct {
 	// server config
 	ServerHost string `env:"ILLA_SERVER_HOST"              envDefault:"0.0.0.0"`
-	ServerPort string `env:"ILLA_SERVER_PORT"              envDefault:"8001"`
+	ServerPort string `env:"ILLA_SERVER_PORT"              envDefault:"8011"`
 	ServerMode string `env:"ILLA_SERVER_MODE"              envDefault:"debug"`
 	DeployMode string `env:"ILLA_DEPLOY_MODE"              envDefault:"self-host"`
 	ServeHTTPS string `env:"ILLA_DEPLOY_SERVE_HTTPS"       envDefault:"false"`

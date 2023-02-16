@@ -164,7 +164,7 @@ INSERT INTO teams (
 INSERT INTO users (
     id, uid, nickname, password_digest, email, avatar, sso_config, customization, created_at, updated_at
 ) VALUES (
-    0, '00000000-0000-0000-0000-000000000000', 'root', '$2a$10$iVIxJRgy1K6RIV389AYg3OiMIbuDyuCIja1xrHGkCljdg/6gdmWXa'::text, 'root', '', to_json('{"default": ""}'::text) , to_json('{"Language": "en-US", "IsSubscribed": false}'::text), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+    0, '00000000-0000-0000-0000-000000000000', 'root', '$2a$10$pA2RkejuvUqZt1mcaH9SpOSxIWv8H2c6pVlBe3looNqeRocYhbN3G', 'root', '', to_json('{"default": ""}'::text) , to_json('{"Language": "en-US", "IsSubscribed": false}'::text), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 );
 
 INSERT INTO team_members (
