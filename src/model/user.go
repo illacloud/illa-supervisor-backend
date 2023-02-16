@@ -1,0 +1,299 @@
+package model
+
+import (
+	"encoding/json"
+	"time"
+
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+)
+
+const CUSTOMIZATION_LANGUAGE_EN_US = "en-US"
+const CUSTOMIZATION_LANGUAGE_ZH_CN = "zh-CN"
+
+const PENDING_USER_ID = 0
+const PENDING_USER_NICKNAME = "pending"
+const PENDING_USER_PASSWORDDIGEST = "pending"
+const PENDING_USER_AVATAR = ""
+
+type User struct {
+	ID             int       `json:"id" gorm:"column:id;type:bigserial;primary_key;index:users_ukey"`
+	UID            uuid.UUID `json:"uid" gorm:"column:uid;type:uuid;not null;index:users_ukey"`
+	Nickname       string    `json:"nickname" gorm:"column:nickname;type:varchar;size:15"`
+	PasswordDigest string    `json:"passworddigest" gorm:"column:password_digest;type:varchar;size:60;not null"`
+	Email          string    `json:"email" gorm:"column:email;type:varchar;size:255;not null"`
+	Avatar         string    `json:"avatar" gorm:"column:avatar;type:varchar;size:255;not null"`
+	SSOConfig      string    `json:"SSOConfig" gorm:"column:sso_config;type:jsonb"`        // for single sign-on data
+	Customization  string    `json:"customization" gorm:"column:customization;type:jsonb"` // for user itself customization config, including: Language, IsSubscribed
+	CreatedAt      time.Time `gorm:"column:created_at;type:timestamp"`
+	UpdatedAt      time.Time `gorm:"column:updated_at;type:timestamp"`
+}
+
+type UserForExport struct {
+	ID           int       `json:"id"`
+	UID          uuid.UUID `json:"uid"`
+	TeamMemberID int       `json:"teamMemberID"`
+	Nickname     string    `json:"nickname"`
+	Email        string    `json:"email"`
+	Avatar       string    `json:"avatar"`
+	Language     string    `json:"language"`
+	IsSubscribed bool      `json:"isSubscribed"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+func NewUser() *User {
+	return &User{}
+}
+
+func (ufe *UserForExport) SetTeamMemberID(teamMemberID int) {
+	ufe.TeamMemberID = teamMemberID
+}
+
+func (u *User) Export() *UserForExport {
+	customization := u.ExportUserCustomization()
+	ret := &UserForExport{}
+	ret.ID = u.ID
+	ret.UID = u.UID
+	if u.Nickname == PENDING_USER_NICKNAME { // reset pending user name for frontend display
+		ret.Nickname = ""
+	} else {
+		ret.Nickname = u.Nickname
+	}
+	ret.Email = u.Email
+	ret.Avatar = u.Avatar
+	ret.Language = customization.Language
+	ret.IsSubscribed = customization.IsSubscribed
+	ret.CreatedAt = u.CreatedAt
+	ret.UpdatedAt = u.UpdatedAt
+	return ret
+}
+
+func (u *User) ConstructByJSON(userJSON []byte) error {
+	if err := json.Unmarshal(userJSON, u); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *User) InitUID() {
+	u.UID = uuid.New()
+}
+
+func (u *User) InitCreatedAt() {
+	u.CreatedAt = time.Now().UTC()
+}
+
+func (u *User) InitUpdatedAt() {
+	u.UpdatedAt = time.Now().UTC()
+}
+
+func (u *User) SetID(id int) {
+	u.ID = id
+}
+
+func (u *User) SetNickname(nickname string) {
+	u.Nickname = nickname
+	u.InitUpdatedAt()
+}
+
+func (u *User) SetAvatar(avatar string) {
+	u.Avatar = avatar
+	u.InitUpdatedAt()
+}
+
+func (u *User) SetPasswordByByte(password []byte) {
+	u.PasswordDigest = string(password)
+	u.InitUpdatedAt()
+}
+
+func (u *User) SetLanguage(language string) {
+	userCustomization := u.ExportUserCustomization()
+	userCustomization.SetLanguage(language)
+	u.SetUserCustomization(userCustomization)
+	u.InitUpdatedAt()
+}
+
+func (u *User) SetUserCustomization(userCustomization *UserCustomization) {
+	u.Customization, _ = userCustomization.Export()
+}
+
+func (u *User) UpdateByUpdateUserAvatarRequest(req *UpdateAvatarRequest) {
+	u.Avatar = req.Avatar
+	u.InitUpdatedAt()
+}
+
+func (u *User) GetUIDInString() string {
+	return u.UID.String()
+}
+
+func (u *User) ExportLanguage() string {
+	userCustomization := u.ExportUserCustomization()
+	return userCustomization.Language
+}
+
+func (u *User) ExportID() int {
+	return u.ID
+}
+
+func (u *User) ExportEmail() string {
+	return u.Email
+}
+
+func NewUserBySignUpRequest(req *SignUpRequest) (*User, error) {
+	user := NewUser()
+	custom := NewUserCustomizationBySignUpRequest(req)
+	ssoc := NewUserSSOConfig()
+	hashPwd, errInBcrypt := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if errInBcrypt != nil {
+		return nil, errInBcrypt
+	}
+	var err error
+	user.Nickname = req.Nickname
+	user.PasswordDigest = string(hashPwd)
+	user.Email = req.Email
+	user.SSOConfig = ssoc.Export()
+	user.Customization, err = custom.Export()
+	if err != nil {
+		return nil, err
+	}
+	user.InitUID()
+	user.InitCreatedAt()
+	user.InitUpdatedAt()
+	return user, nil
+}
+
+func NewUserByCreateUserRequest(req *CreateUserRequest) *User {
+	user := NewUser()
+	user.Nickname = req.Nickname
+	user.PasswordDigest = req.PasswordDigest
+	user.Email = req.Email
+	user.SSOConfig = req.SSOConfig
+	user.Customization = req.Customization
+	user.InitUID()
+	user.InitCreatedAt()
+	user.InitUpdatedAt()
+	return user
+}
+
+func NewPendingUserByInvite(i *Invite) (*User, error) {
+	ssoc := NewUserSSOConfig()
+	uc := NewUserCustomization()
+	var errInExport error
+	user := NewUser()
+	user.Nickname = PENDING_USER_NICKNAME
+	user.PasswordDigest = PENDING_USER_PASSWORDDIGEST
+	user.Email = i.Email
+	user.Avatar = PENDING_USER_AVATAR
+	user.SSOConfig = ssoc.Export()
+	user.Customization, errInExport = uc.Export()
+	if errInExport != nil {
+		return nil, errInExport
+	}
+	user.InitUID()
+	user.InitCreatedAt()
+	user.InitUpdatedAt()
+	return user, nil
+}
+
+func NewPendingUserByInviteForExport(inviteForExport *InviteForExport) (*User, error) {
+	var errInExport error
+	ssoc := NewUserSSOConfig()
+	uc := NewUserCustomization()
+	user := NewUser()
+	user.Nickname = PENDING_USER_NICKNAME
+	user.PasswordDigest = PENDING_USER_PASSWORDDIGEST
+	user.Email = inviteForExport.Email
+	user.Avatar = PENDING_USER_AVATAR
+	user.SSOConfig = ssoc.Export()
+	user.Customization, errInExport = uc.Export()
+	if errInExport != nil {
+		return nil, errInExport
+	}
+	user.InitUID()
+	user.InitCreatedAt()
+	user.InitUpdatedAt()
+	return user, nil
+}
+
+func (u *User) UpdatePendingUserBySignUpRequest(req *SignUpRequest) error {
+	custom := NewUserCustomizationBySignUpRequest(req)
+	ssoc := NewUserSSOConfig()
+	hashPwd, errInBcrypt := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if errInBcrypt != nil {
+		return errInBcrypt
+	}
+	var err error
+	u.Nickname = req.Nickname
+	u.PasswordDigest = string(hashPwd)
+	u.SSOConfig = ssoc.Export()
+	u.Customization, err = custom.Export()
+	if err != nil {
+		return err
+	}
+	u.InitUpdatedAt()
+	return nil
+}
+
+func (u *User) ExportUserCustomization() *UserCustomization {
+	userCustomization := NewUserCustomization()
+	json.Unmarshal([]byte(u.Customization), &userCustomization)
+	return userCustomization
+}
+
+type UserCustomization struct {
+	Language     string
+	IsSubscribed bool
+}
+
+func NewUserCustomization() *UserCustomization {
+	return &UserCustomization{
+		Language:     CUSTOMIZATION_LANGUAGE_EN_US,
+		IsSubscribed: false,
+	}
+}
+
+func NewUserCustomizationBySignUpRequest(req *SignUpRequest) *UserCustomization {
+	return &UserCustomization{
+		Language:     req.Language,
+		IsSubscribed: req.IsSubscribed,
+	}
+}
+
+func (c *UserCustomization) Export() (string, error) {
+	b, err := json.Marshal(c)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func (c *UserCustomization) SetLanguage(language string) {
+	c.Language = language
+}
+
+func (c *UserCustomization) SetIsSubscribed(isSubscribed bool) {
+	c.IsSubscribed = isSubscribed
+}
+
+func BuildLookUpTableForUserExport(users []*User) map[int]*UserForExport {
+	usersNum := len(users)
+	lt := make(map[int]*UserForExport, usersNum)
+	for _, user := range users {
+		lt[user.ID] = user.Export()
+	}
+	return lt
+}
+
+type UserSSOConfig struct {
+	Github string
+}
+
+func NewUserSSOConfig() *UserSSOConfig {
+	return &UserSSOConfig{}
+}
+
+func (u *UserSSOConfig) Export() string {
+	r, _ := json.Marshal(u)
+	return string(r)
+}
