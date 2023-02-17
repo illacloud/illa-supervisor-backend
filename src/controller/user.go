@@ -245,7 +245,7 @@ func (controller *Controller) signUpWithoutToken(req *model.SignUpRequest, c *gi
 	user.SetID(newUserIDInt)
 
 	// create team member
-	teamMember := model.NewViewerTeamMemberByUserID(newUserIDInt)
+	teamMember := model.NewEditorTeamMemberByUserID(newUserIDInt)
 	if _, err := controller.Storage.TeamMemberStorage.Create(teamMember); err != nil {
 		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_TEAM_MEMBER, "create team member error: "+err.Error())
 		return

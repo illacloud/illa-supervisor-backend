@@ -264,12 +264,12 @@ func NewTeamMemberByTeamIDAndUserIDAndUserRole(teamID, userID, userRole int) *Te
 	return TeamMember
 }
 
-func NewViewerTeamMemberByUserID(userID int) *TeamMember {
+func NewEditorTeamMemberByUserID(userID int) *TeamMember {
 	tmp := NewTeamMemberPermission()
 	TeamMember := NewTeamMember()
 	TeamMember.TeamID = TEAM_DEFAULT_ID
 	TeamMember.UserID = userID
-	TeamMember.UserRole = accesscontrol.USER_ROLE_VIEWER
+	TeamMember.UserRole = accesscontrol.USER_ROLE_EDITOR
 	TeamMember.Permission = tmp.ExportForTeam()
 	TeamMember.Status = TEAM_MEMBER_STATUS_OK
 	TeamMember.InitCreatedAt()
