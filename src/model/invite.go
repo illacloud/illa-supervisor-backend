@@ -9,7 +9,7 @@ import (
 	"encoding/base64"
 
 	"github.com/google/uuid"
-	"github.com/illacloud/illa-supervisior-backend/src/utils/idconvertor"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/idconvertor"
 )
 
 // invite record category

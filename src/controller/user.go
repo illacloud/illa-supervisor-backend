@@ -8,7 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/illacloud/illa-supervisior-backend/src/model"
+	"github.com/illacloud/illa-supervisor-backend/src/model"
 )
 
 // generate and send verification code email

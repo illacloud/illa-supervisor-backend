@@ -3,8 +3,8 @@
 all: build 
 
 build:
-	go build -o bin/illa-supervisior-backend src/cmd/illa-supervisior-backend/main.go
-	go build -o bin/illa-supervisior-backend-internal src/cmd/illa-supervisior-backend-internal/main.go
+	go build -o bin/illa-supervisor-backend src/cmd/illa-supervisor-backend/main.go
+	go build -o bin/illa-supervisor-backend-internal src/cmd/illa-supervisor-backend-internal/main.go
 
 test:
 	PROJECT_PWD=$(shell pwd) go test -race ./...

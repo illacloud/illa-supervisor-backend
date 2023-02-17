@@ -3,18 +3,18 @@ package main
 import (
 	"os"
 
-	"github.com/illacloud/illa-supervisior-backend/src/authenticator"
-	"github.com/illacloud/illa-supervisior-backend/src/controller"
-	"github.com/illacloud/illa-supervisior-backend/src/driver/awss3"
-	"github.com/illacloud/illa-supervisior-backend/src/driver/minio"
-	"github.com/illacloud/illa-supervisior-backend/src/driver/postgres"
-	"github.com/illacloud/illa-supervisior-backend/src/model"
-	"github.com/illacloud/illa-supervisior-backend/src/router"
-	"github.com/illacloud/illa-supervisior-backend/src/utils/config"
-	"github.com/illacloud/illa-supervisior-backend/src/utils/cors"
-	"github.com/illacloud/illa-supervisior-backend/src/utils/logger"
-	"github.com/illacloud/illa-supervisior-backend/src/utils/recovery"
-	"github.com/illacloud/illa-supervisior-backend/src/utils/tokenvalidator"
+	"github.com/illacloud/illa-supervisor-backend/src/authenticator"
+	"github.com/illacloud/illa-supervisor-backend/src/controller"
+	"github.com/illacloud/illa-supervisor-backend/src/driver/awss3"
+	"github.com/illacloud/illa-supervisor-backend/src/driver/minio"
+	"github.com/illacloud/illa-supervisor-backend/src/driver/postgres"
+	"github.com/illacloud/illa-supervisor-backend/src/model"
+	"github.com/illacloud/illa-supervisor-backend/src/router"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/cors"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/logger"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/recovery"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/tokenvalidator"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -86,7 +86,7 @@ func initServer() (*Server, error) {
 }
 
 func (server *Server) Start() {
-	server.logger.Infow("Starting illa-supervisior-backend.")
+	server.logger.Infow("Starting illa-supervisor-backend.")
 
 	// init
 	gin.SetMode(server.config.ServerMode)

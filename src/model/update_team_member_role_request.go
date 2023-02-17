@@ -1,6 +1,6 @@
 package model
 
-import "github.com/illacloud/illa-supervisior-backend/src/accesscontrol"
+import "github.com/illacloud/illa-supervisor-backend/src/accesscontrol"
 
 type UpdateTeamMemberRoleRequest struct {
 	UserRole int `json:"userRole" validate:"required"`

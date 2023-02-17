@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/illacloud/illa-supervisior-backend/src/accesscontrol"
+	"github.com/illacloud/illa-supervisor-backend/src/accesscontrol"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

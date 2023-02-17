@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/illacloud/illa-supervisior-backend/src/accesscontrol"
-	"github.com/illacloud/illa-supervisior-backend/src/model"
+	"github.com/illacloud/illa-supervisor-backend/src/accesscontrol"
+	"github.com/illacloud/illa-supervisor-backend/src/model"
 )
 
 // InviteByEmail

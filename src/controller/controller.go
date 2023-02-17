@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/illacloud/illa-supervisior-backend/src/model"
-	"github.com/illacloud/illa-supervisior-backend/src/utils/tokenvalidator"
+	"github.com/illacloud/illa-supervisor-backend/src/model"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/tokenvalidator"
 )
 
 type Controller struct {

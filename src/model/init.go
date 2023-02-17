@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/illacloud/illa-supervisior-backend/src/utils/config"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
 )
 
 var Config *config.Config

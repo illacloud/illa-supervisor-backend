@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/illacloud/illa-supervisior-backend/src/accesscontrol"
+	"github.com/illacloud/illa-supervisor-backend/src/accesscontrol"
 )
 
 const TEAM_MEMBER_STATUS_OK = 1

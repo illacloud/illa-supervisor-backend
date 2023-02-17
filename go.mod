@@ -1,4 +1,4 @@
-module github.com/illacloud/illa-supervisior-backend
+module github.com/illacloud/illa-supervisor-backend
 
 go 1.18
 

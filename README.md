@@ -1,4 +1,4 @@
-illa-supervisior-backend
+illa-supervisor-backend
 ------------------------
 
 
@@ -10,7 +10,7 @@ illa-supervisior-backend
 
 # Desc
 
-illa supervisior for illa units.
+illa supervisor for illa units.
 
 
 

@@ -1,6 +1,6 @@
 package model
 
-import "github.com/illacloud/illa-supervisior-backend/src/utils/idconvertor"
+import "github.com/illacloud/illa-supervisor-backend/src/utils/idconvertor"
 
 type GenerateInviteLinkResponse struct {
 	TeamID     string `json:"teamID"`
