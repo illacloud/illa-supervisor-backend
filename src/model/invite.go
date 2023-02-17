@@ -20,38 +20,40 @@ const CATEGORY_INVITE_BY_EMAIL = 2
 const INVITE_RECORD_STATUS_OK = 1
 
 const INVITE_URI_TEMPLATE = "?inviteToken=%s"
-const INVITE_EMAIL_TEMPLATE = "&email=%s"
-const INVITE_SHARE_APP_TEMPLATE = "&appID=%s"
-const INVITE_EMAIL_AND_SHARE_APP_TEMPLATE = "&email=%s&appID=%s"
+const INVITE_EMAIL_TEMPLATE = "&teamIdentifier=%s&email=%s"
+const INVITE_SHARE_APP_TEMPLATE = "&teamIdentifier=%s&appID=%s"
+const INVITE_EMAIL_AND_SHARE_APP_TEMPLATE = "&teamIdentifier=%s&email=%s&appID=%s"
 
 type Invite struct {
-	ID           int       `json:"id" gorm:"column:id;type:bigserial;primary_key;index:invite_ukey"`
-	UID          uuid.UUID `json:"uid" gorm:"column:uid;type:uuid;not null;index:invite_uid"`
-	Category     int       `json:"category" gorm:"column:category;type:smallint;not null"`
-	TeamID       int       `json:"teamID" gorm:"column:team_id;type:bigserial;index:users_ukey"`
-	TeamMemberID int       `json:"teamMemberID" gorm:"column:team_member_id;type:bigserial"`
-	AppID        int       `json:"appID" gorm:"column:team_member_id;type:bigserial"`
-	Email        string    `json:"email" gorm:"column:email;type:varchar;size:255;;index:invite_email"`
-	EmailStatus  bool      `json:"emailStatus" gorm:"column:email_status;type:bool"`
-	UserRole     int       `json:"userRole" gorm:"column:user_role;type:smallint;index:invite_user_role"`
-	Status       int       `json:"status" gorm:"column:status;type:smallint;index:users_ukey"`
-	CreatedAt    time.Time `gorm:"column:created_at;type:timestamp"`
-	UpdatedAt    time.Time `gorm:"column:updated_at;type:timestamp"`
+	ID             int       `json:"id" gorm:"column:id;type:bigserial;primary_key;index:invite_ukey"`
+	UID            uuid.UUID `json:"uid" gorm:"column:uid;type:uuid;not null;index:invite_uid"`
+	Category       int       `json:"category" gorm:"column:category;type:smallint;not null"`
+	TeamID         int       `json:"teamID" gorm:"column:team_id;type:bigserial;index:users_ukey"`
+	TeamMemberID   int       `json:"teamMemberID" gorm:"column:team_member_id;type:bigserial"`
+	TeamIdentifier string    `json:"teamIdentifier" sql:"-" gorm:"-"`
+	AppID          int       `json:"appID" sql:"-" gorm:"-"`
+	Email          string    `json:"email" gorm:"column:email;type:varchar;size:255;;index:invite_email"`
+	EmailStatus    bool      `json:"emailStatus" gorm:"column:email_status;type:bool"`
+	UserRole       int       `json:"userRole" gorm:"column:user_role;type:smallint;index:invite_user_role"`
+	Status         int       `json:"status" gorm:"column:status;type:smallint;index:users_ukey"`
+	CreatedAt      time.Time `gorm:"column:created_at;type:timestamp"`
+	UpdatedAt      time.Time `gorm:"column:updated_at;type:timestamp"`
 }
 
 type InviteForExport struct {
-	ID           int       `json:"id"`
-	UID          uuid.UUID `json:"uid"`
-	Category     int       `json:"category"`
-	TeamID       int       `json:"teamID"`
-	TeamMemberID int       `json:"teamMemberID"`
-	AppID        int       `json:"appID"`
-	Email        string    `json:"email"`
-	EmailStatus  bool      `json:"emailStatus"`
-	UserRole     int       `json:"userRole"`
-	Status       int       `json:"status"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	ID             int       `json:"id"`
+	UID            uuid.UUID `json:"uid"`
+	Category       int       `json:"category"`
+	TeamID         int       `json:"teamID"`
+	TeamMemberID   int       `json:"teamMemberID"`
+	TeamIdentifier string    `json:"teamIdentifier"`
+	AppID          int       `json:"appID"`
+	Email          string    `json:"email"`
+	EmailStatus    bool      `json:"emailStatus"`
+	UserRole       int       `json:"userRole"`
+	Status         int       `json:"status"`
+	CreatedAt      time.Time `json:"createdAt"`
+	UpdatedAt      time.Time `json:"updatedAt"`
 }
 
 func NewInvite() *Invite {
@@ -93,6 +95,10 @@ func (u *Invite) SetTeamMemberID(teamMemberID int) {
 	u.TeamMemberID = teamMemberID
 }
 
+func (u *Invite) SetTeamIdentifier(teamIdentifier string) {
+	u.TeamIdentifier = teamIdentifier
+}
+
 func (u *Invite) SetAppID(appID int) {
 	fmt.Printf("appID: %v, u.AppID: %v\n", appID, u.AppID)
 	u.AppID = appID
@@ -104,18 +110,19 @@ func (u *Invite) ExportID() int {
 
 func (u *Invite) Export() *InviteForExport {
 	return &InviteForExport{
-		ID:           u.ID,
-		UID:          u.UID,
-		Category:     u.Category,
-		TeamID:       u.TeamID,
-		TeamMemberID: u.TeamMemberID,
-		AppID:        u.AppID,
-		Email:        u.Email,
-		EmailStatus:  u.EmailStatus,
-		UserRole:     u.UserRole,
-		Status:       u.Status,
-		CreatedAt:    u.CreatedAt,
-		UpdatedAt:    u.UpdatedAt,
+		ID:             u.ID,
+		UID:            u.UID,
+		Category:       u.Category,
+		TeamID:         u.TeamID,
+		TeamMemberID:   u.TeamMemberID,
+		TeamIdentifier: u.TeamIdentifier,
+		AppID:          u.AppID,
+		Email:          u.Email,
+		EmailStatus:    u.EmailStatus,
+		UserRole:       u.UserRole,
+		Status:         u.Status,
+		CreatedAt:      u.CreatedAt,
+		UpdatedAt:      u.UpdatedAt,
 	}
 }
 
@@ -130,15 +137,15 @@ func (u *Invite) ExportInviteLink() string {
 }
 
 func (u *Invite) ExportShareAppLink() string {
-	return u.ExportInviteLink() + fmt.Sprintf(INVITE_SHARE_APP_TEMPLATE, idconvertor.ConvertIntToString(u.AppID))
+	return u.ExportInviteLink() + fmt.Sprintf(INVITE_SHARE_APP_TEMPLATE, u.TeamIdentifier, idconvertor.ConvertIntToString(u.AppID))
 }
 
-func (u *Invite) ExportInviteLinkWithEmail() string {
-	return u.ExportInviteLink() + fmt.Sprintf(INVITE_EMAIL_TEMPLATE, u.Email)
+func (u *Invite) ExportInviteLinkWithEmailAndTeam(team *Team) string {
+	return u.ExportInviteLink() + fmt.Sprintf(INVITE_EMAIL_TEMPLATE, team.GetIdentifier(), u.Email)
 }
 
-func (u *Invite) ExportShareAppLinkWithEmail() string {
-	return u.ExportInviteLink() + fmt.Sprintf(INVITE_EMAIL_AND_SHARE_APP_TEMPLATE, u.Email, idconvertor.ConvertIntToString(u.AppID))
+func (u *Invite) ExportShareAppLinkWithEmailANDTeamIdentifier(team *Team) string {
+	return u.ExportInviteLink() + fmt.Sprintf(INVITE_EMAIL_AND_SHARE_APP_TEMPLATE, team.GetIdentifier(), u.Email, idconvertor.ConvertIntToString(u.AppID))
 }
 
 func (u *Invite) ExportTeamID() int {
@@ -206,10 +213,11 @@ func (u *Invite) IsShareAppInvite() bool {
 	return false
 }
 
-func NewInviteLinkByTeamIDAndUserRole(teamID int, userRole int) *Invite {
+func NewInviteLinkByTeamAndUserRole(team *Team, userRole int) *Invite {
 	Invite := NewInvite()
 	Invite.Category = CATEGORY_INVITE_BY_LINK
-	Invite.TeamID = teamID
+	Invite.TeamID = team.ID
+	Invite.TeamIdentifier = team.Identifier
 	Invite.AppID = 0
 	Invite.Email = "" // invite by link, the email was not setted
 	Invite.UserRole = userRole
@@ -220,10 +228,11 @@ func NewInviteLinkByTeamIDAndUserRole(teamID int, userRole int) *Invite {
 	return Invite
 }
 
-func NewInviteEmailLinkByTeamIDAndRequest(teamID int, req *InviteMemberByEmailRequest) *Invite {
+func NewInviteEmailLinkByTeamAndRequest(team *Team, req *InviteMemberByEmailRequest) *Invite {
 	Invite := NewInvite()
 	Invite.Category = CATEGORY_INVITE_BY_EMAIL
-	Invite.TeamID = teamID
+	Invite.TeamID = team.ID
+	Invite.TeamIdentifier = team.Identifier
 	Invite.AppID = 0
 	Invite.Email = req.ExportEmail()
 	Invite.UserRole = req.ExportUserRole()
@@ -291,7 +300,7 @@ func NewEmailInviteMessage(invite *Invite, team *Team, user *User) *EmailInviteM
 		TeamName: team.Name,
 		TeamIcon: team.Icon,
 		Email:    invite.Email,
-		JoinLink: invite.ExportInviteLinkWithEmail(),
+		JoinLink: invite.ExportInviteLinkWithEmailAndTeam(team),
 		Language: user.ExportLanguage(),
 	}
 }
@@ -329,7 +338,7 @@ func NewEmailShareAppMessage(invite *Invite, team *Team, user *User) *EmailShare
 		TeamName: team.Name,
 		TeamIcon: team.Icon,
 		Email:    invite.Email,
-		AppLink:  invite.ExportShareAppLinkWithEmail(),
+		AppLink:  invite.ExportShareAppLinkWithEmailANDTeamIdentifier(team),
 		Language: user.ExportLanguage(),
 	}
 }

@@ -95,6 +95,10 @@ func (u *Team) GetUIDInString() string {
 	return u.UID.String()
 }
 
+func (u *Team) GetIdentifier() string {
+	return u.Identifier
+}
+
 func (u *Team) UpdateByUpdateTeamConfigRawRequest(rawReq map[string]interface{}) error {
 	var assertPass bool
 	for key, value := range rawReq {

@@ -120,6 +120,9 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 	// already exists
 	if errInFetchInvite == nil {
 
+		// set team identifier (the team identifier won't storage in invite record)
+		existsInvite.SetTeamIdentifier(team.GetIdentifier())
+
 		// share app invite email
 		if req.IsShareAppInvite() {
 			existsInvite.SetAppID(req.ExportAppID())
@@ -167,7 +170,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 
 	// - false, resend phrase
 	// - new invite email
-	newInviteEmailLink := model.NewInviteEmailLinkByTeamIDAndRequest(teamID, req)
+	newInviteEmailLink := model.NewInviteEmailLinkByTeamAndRequest(team, req) // team identifier included
 
 	// share app invite email
 	if req.IsShareAppInvite() {
@@ -273,13 +276,14 @@ func (controller *Controller) GenerateInviteLink(c *gin.Context) {
 	if err == nil && invite != nil {
 		if appIDSetted {
 			invite.SetAppID(appID)
+			invite.SetTeamIdentifier(team.GetIdentifier())
 		}
 		controller.FeedbackInviteByLink(c, invite)
 		return
 	}
 
 	// invite link not exists, generate invite link
-	newInviteLink := model.NewInviteLinkByTeamIDAndUserRole(teamID, userRole)
+	newInviteLink := model.NewInviteLinkByTeamAndUserRole(team, userRole)
 
 	// storage invite link to database
 	if controller.StorageInvite(c, newInviteLink) != nil {
@@ -377,13 +381,14 @@ func (controller *Controller) RenewInviteLink(c *gin.Context) {
 	}
 
 	// generate new invite link
-	newInviteLink := model.NewInviteLinkByTeamIDAndUserRole(teamID, userRole)
+	newInviteLink := model.NewInviteLinkByTeamAndUserRole(team, userRole) // team identifier included
 
 	// storage invite link to database
 	if controller.StorageInvite(c, newInviteLink) != nil {
 		return
 	}
 
+	// invite by app
 	if appIDSetted {
 		newInviteLink.SetAppID(appID)
 	}
