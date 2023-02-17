@@ -9,6 +9,33 @@ import (
 	"github.com/illacloud/illa-supervisior-backend/src/model"
 )
 
+func (controller *Controller) GetMyTeams(c *gin.Context) {
+	userID, errInGetUserID := controller.GetUserIDFromAuth(c)
+	if errInGetUserID != nil {
+		return
+	}
+
+	// retrieve
+	teamMembers, errInGetTeamMember := controller.Storage.TeamMemberStorage.RetrieveByUserID(userID)
+	if errInGetTeamMember != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team by id error: "+errInGetTeamMember.Error())
+		return
+	}
+	teamIDs := model.PickUpTeamIDsInTeamMembers(teamMembers)
+	teams, errInGetTeam := controller.Storage.TeamStorage.RetrieveByIDs(teamIDs)
+	if errInGetTeam != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "retrieve team by ids error: "+errInGetTeam.Error())
+		return
+	}
+
+	// build lookup table for feedback
+	tmlt := model.BuildTeamIDLookUpTableForTeamMemberExport(teamMembers)
+
+	// feedback
+	controller.FeedbackOK(c, model.NewGetMyTeamsResponse(teams, tmlt))
+	return
+}
+
 func (controller *Controller) UpdateTeamConfig(c *gin.Context) {
 	// get team id & user id
 	teamID := model.TEAM_DEFAULT_ID

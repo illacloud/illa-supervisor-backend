@@ -48,6 +48,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	usersRouter.DELETE("", r.Controller.DeleteUser)
 
 	// teams routers
+	teamsRouter.GET("/my", r.Controller.GetMyTeams)
 	teamsRouter.PATCH("/:teamID/config", r.Controller.UpdateTeamConfig)
 	teamsRouter.PATCH("/:teamID/permission", r.Controller.UpdateTeamPermission)
 
