@@ -70,13 +70,7 @@ func (controller *Controller) SignUp(c *gin.Context) {
 		return
 	}
 
-	// validate verification code
-	validCode, err := model.ValidateVerificationCode(req.VerificationCode, req.VerificationToken,
-		req.Email, "signup")
-	if err != nil || !validCode {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_VERIFICATION_CODE_FAILED, "validate verification code error: "+err.Error())
-		return
-	}
+	// @todo: validate verification code when user smtp server configureable
 
 	// [join team if invite token setted]
 	if req.IsSignUpWithInviteLink() {

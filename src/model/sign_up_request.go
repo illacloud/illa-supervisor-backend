@@ -5,10 +5,10 @@ type SignUpRequest struct {
 	Email             string `json:"email" validate:"required"`
 	Password          string `json:"password" validate:"required"`
 	Language          string `json:"language" validate:"oneof=zh-CN en-US ja-JP ko-KR"`
-	IsSubscribed      bool   `json:"isSubscribed"` // is subscribed are optional
-	VerificationCode  string `json:"verificationCode" validate:"required"`
-	VerificationToken string `json:"verificationToken" validate:"required"`
-	InviteToken       string `json:"inviteToken"` // invite token are optional
+	IsSubscribed      bool   `json:"isSubscribed"`      // is subscribed are optional
+	VerificationCode  string `json:"verificationCode"`  // @todo: add validate:"required" when uset smtp server configureable
+	VerificationToken string `json:"verificationToken"` // @todo: add validate:"required" when uset smtp server configureable
+	InviteToken       string `json:"inviteToken"`       // invite token are optional
 }
 
 func NewSignUpRequest() *SignUpRequest {
