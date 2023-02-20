@@ -338,8 +338,8 @@ func (controller *Controller) RemoveTeamMember(c *gin.Context) {
 	// remove user from invite for pending user
 	controller.Storage.InviteStorage.DeleteByTeamIDAndTeamMemberID(teamID, targetTeamMember.ExportID())
 
-	// remove user
-	controller.Storage.UserStorage.DeleteByID(userID)
+	// remove target user
+	controller.Storage.UserStorage.DeleteByID(targetTeamMember.ExportUserID())
 
 	// feedback
 	controller.FeedbackOK(c, nil)
