@@ -6,11 +6,10 @@ import (
 )
 
 type Storage struct {
-	UserStorage           *UserStorage
-	TeamStorage           *TeamStorage
-	TeamMemberStorage     *TeamMemberStorage
-	InviteStorage         *InviteStorage
-	InvitationCodeStorage *InvitationCodeStorage
+	UserStorage       *UserStorage
+	TeamStorage       *TeamStorage
+	TeamMemberStorage *TeamMemberStorage
+	InviteStorage     *InviteStorage
 }
 
 func NewStorage(postgresDriver *gorm.DB, logger *zap.SugaredLogger) *Storage {
@@ -18,12 +17,10 @@ func NewStorage(postgresDriver *gorm.DB, logger *zap.SugaredLogger) *Storage {
 	teamStorage := NewTeamStorage(postgresDriver, logger)
 	teamMemberStorage := NewTeamMemberStorage(postgresDriver, logger)
 	inviteStorage := NewInviteStorage(postgresDriver, logger)
-	invitationCodeStorage := NewInvitationCodeStorage(postgresDriver, logger)
 	return &Storage{
-		UserStorage:           userStorage,
-		TeamStorage:           teamStorage,
-		TeamMemberStorage:     teamMemberStorage,
-		InviteStorage:         inviteStorage,
-		InvitationCodeStorage: invitationCodeStorage,
+		UserStorage:       userStorage,
+		TeamStorage:       teamStorage,
+		TeamMemberStorage: teamMemberStorage,
+		InviteStorage:     inviteStorage,
 	}
 }

@@ -5,7 +5,6 @@ import (
 
 	"github.com/illacloud/illa-supervisor-backend/src/authenticator"
 	"github.com/illacloud/illa-supervisor-backend/src/controller"
-	"github.com/illacloud/illa-supervisor-backend/src/driver/awss3"
 	"github.com/illacloud/illa-supervisor-backend/src/driver/minio"
 	"github.com/illacloud/illa-supervisor-backend/src/driver/postgres"
 	"github.com/illacloud/illa-supervisor-backend/src/model"
@@ -37,21 +36,11 @@ func NewServer(config *config.Config, engine *gin.Engine, router *router.Router,
 }
 
 func initDrive(globalConfig *config.Config, logger *zap.SugaredLogger) *model.Drive {
-	if globalConfig.IsAWSDrive() {
-		systemAWSConfig := awss3.NewSystemAwsConfigByGlobalConfig(globalConfig)
-		teamAWSConfig := awss3.NewTeamAwsConfigByGlobalConfig(globalConfig)
-		systemDriveS3Instance := awss3.NewS3Drive(systemAWSConfig)
-		teamDriveS3Instance := awss3.NewS3Drive(teamAWSConfig)
-		return model.NewDrive(systemDriveS3Instance, teamDriveS3Instance, logger)
-	} else if globalConfig.IsMINIODrive() {
-		systemMINIOConfig := minio.NewSystemMINIOConfigByGlobalConfig(globalConfig)
-		teamMINIOConfig := minio.NewTeamMINIOConfigByGlobalConfig(globalConfig)
-		systemDriveS3Instance := minio.NewS3Drive(systemMINIOConfig)
-		teamDriveS3Instance := minio.NewS3Drive(teamMINIOConfig)
-		return model.NewDrive(systemDriveS3Instance, teamDriveS3Instance, logger)
-	}
-	logger.Errorw("Error in startup, drive init failed.")
-	return nil
+	systemMINIOConfig := minio.NewSystemMINIOConfigByGlobalConfig(globalConfig)
+	teamMINIOConfig := minio.NewTeamMINIOConfigByGlobalConfig(globalConfig)
+	systemDriveS3Instance := minio.NewS3Drive(systemMINIOConfig)
+	teamDriveS3Instance := minio.NewS3Drive(teamMINIOConfig)
+	return model.NewDrive(systemDriveS3Instance, teamDriveS3Instance, logger)
 }
 
 func initServer() (*Server, error) {
