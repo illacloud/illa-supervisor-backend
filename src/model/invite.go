@@ -32,6 +32,7 @@ type Invite struct {
 	TeamMemberID   int       `json:"teamMemberID" gorm:"column:team_member_id;type:bigserial"`
 	TeamIdentifier string    `json:"teamIdentifier" sql:"-" gorm:"-"`
 	AppID          int       `json:"appID" sql:"-" gorm:"-"`
+	Hosts          string    `json:"hosts" sql:"-" gorm:"-"`
 	Email          string    `json:"email" gorm:"column:email;type:varchar;size:255;;index:invite_email"`
 	EmailStatus    bool      `json:"emailStatus" gorm:"column:email_status;type:bool"`
 	UserRole       int       `json:"userRole" gorm:"column:user_role;type:smallint;index:invite_user_role"`
@@ -100,8 +101,11 @@ func (u *Invite) SetTeamIdentifier(teamIdentifier string) {
 }
 
 func (u *Invite) SetAppID(appID int) {
-	fmt.Printf("appID: %v, u.AppID: %v\n", appID, u.AppID)
 	u.AppID = appID
+}
+
+func (u *Invite) SetHosts(hosts string) {
+	u.Hosts = hosts
 }
 
 func (u *Invite) ExportID() int {
@@ -132,7 +136,10 @@ func (u *Invite) ExportUID() uuid.UUID {
 
 func (u *Invite) ExportInviteLink() string {
 	template := ""
-	template = Config.GetServeHTTPAddress() + INVITE_URI_TEMPLATE
+	if u.Hosts == "" {
+		u.Hosts = Config.GetServeHTTPAddress()
+	}
+	template = u.Hosts + INVITE_URI_TEMPLATE
 	return fmt.Sprintf(template, base64.StdEncoding.EncodeToString([]byte(u.UID.String())))
 }
 
@@ -234,21 +241,7 @@ func NewInviteEmailLinkByTeamAndRequest(team *Team, req *InviteMemberByEmailRequ
 	Invite.TeamID = team.ID
 	Invite.TeamIdentifier = team.Identifier
 	Invite.AppID = 0
-	Invite.Email = req.ExportEmail()
-	Invite.UserRole = req.ExportUserRole()
-	Invite.Status = INVITE_RECORD_STATUS_OK
-	Invite.InitUID()
-	Invite.InitCreatedAt()
-	Invite.InitUpdatedAt()
-	return Invite
-}
-
-func NewInviteEmailLinkByTeamIDAndTeamMemberIDAndRequest(teamID int, teamMemberID int, req *InviteMemberByEmailRequest) *Invite {
-	Invite := NewInvite()
-	Invite.Category = CATEGORY_INVITE_BY_EMAIL
-	Invite.TeamID = teamID
-	Invite.AppID = 0
-	Invite.TeamMemberID = teamMemberID
+	Invite.Hosts = req.ExportHosts()
 	Invite.Email = req.ExportEmail()
 	Invite.UserRole = req.ExportUserRole()
 	Invite.Status = INVITE_RECORD_STATUS_OK

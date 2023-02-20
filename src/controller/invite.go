@@ -122,6 +122,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 
 		// set team identifier (the team identifier won't storage in invite record)
 		existsInvite.SetTeamIdentifier(team.GetIdentifier())
+		existsInvite.SetHosts(req.ExportHosts())
 
 		// share app invite email
 		if req.IsShareAppInvite() {
