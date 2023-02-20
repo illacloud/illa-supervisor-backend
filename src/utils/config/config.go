@@ -14,11 +14,12 @@ const DRIVE_TYPE_MINIO = "minio"
 
 type Config struct {
 	// server config
-	ServerHost string `env:"ILLA_SERVER_HOST"              envDefault:"0.0.0.0"`
-	ServerPort string `env:"ILLA_SERVER_PORT"              envDefault:"8011"`
-	ServerMode string `env:"ILLA_SERVER_MODE"              envDefault:"debug"`
-	DeployMode string `env:"ILLA_DEPLOY_MODE"              envDefault:"self-host"`
-	ServeHTTPS string `env:"ILLA_DEPLOY_SERVE_HTTPS"       envDefault:"false"`
+	ServerHost         string `env:"ILLA_SERVER_HOST"              envDefault:"0.0.0.0"`
+	ServerPort         string `env:"ILLA_SERVER_PORT"              envDefault:"8003"`
+	InternalServerPort string `env:"ILLA_SERVER_INTERNAL_PORT"     envDefault:"9001"`
+	ServerMode         string `env:"ILLA_SERVER_MODE"              envDefault:"debug"`
+	DeployMode         string `env:"ILLA_DEPLOY_MODE"              envDefault:"self-host"`
+	ServeHTTPS         string `env:"ILLA_DEPLOY_SERVE_HTTPS"       envDefault:"false"`
 
 	// drive config
 	DriveType             string `env:"ILLA_DRIVE_TYPE"               envDefault:""`

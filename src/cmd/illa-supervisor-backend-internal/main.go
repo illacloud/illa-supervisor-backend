@@ -84,7 +84,7 @@ func (server *Server) Start() {
 	server.engine.Use(cors.Cors())
 	server.router.RegisterRouters(server.engine)
 
-	err := server.engine.Run(server.config.ServerHost + ":" + server.config.ServerPort)
+	err := server.engine.Run(server.config.ServerHost + ":" + server.config.InternalServerPort)
 	if err != nil {
 		server.logger.Errorw("Error in startup", "err", err)
 		os.Exit(2)
