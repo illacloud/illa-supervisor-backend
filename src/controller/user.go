@@ -85,7 +85,7 @@ func (controller *Controller) SignUp(c *gin.Context) {
 		// fetch invite record from storage
 		inviteRecord, errFetchInvite := controller.Storage.InviteStorage.RetrieveByUID(invite.ExportUID())
 		if errFetchInvite != nil {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_INVITE, "fetch invite record error: "+errFetchInvite.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_INVITE, "fetch invite record error: "+errFetchInvite.Error())
 			return
 		}
 
@@ -236,7 +236,7 @@ func (controller *Controller) signUpWithoutToken(req *model.SignUpRequest, c *gi
 	// create user
 	newUserIDInt, errInCreateUser := controller.Storage.UserStorage.Create(user)
 	if errInCreateUser != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_USER, "create user error: "+errInCreateUser.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_USER, "create user error: "+errInCreateUser.Error())
 		return
 	}
 	if !req.IsSubscribed {
@@ -247,7 +247,7 @@ func (controller *Controller) signUpWithoutToken(req *model.SignUpRequest, c *gi
 	// create team member
 	teamMember := model.NewEditorTeamMemberByUserID(newUserIDInt)
 	if _, err := controller.Storage.TeamMemberStorage.Create(teamMember); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_TEAM_MEMBER, "create team member error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_TEAM_MEMBER, "create team member error: "+err.Error())
 		return
 	}
 
@@ -279,14 +279,14 @@ func (controller *Controller) SignIn(c *gin.Context) {
 	// fetch user by email
 	user, err := controller.Storage.UserStorage.RetrieveByEmail(req.Email)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_SIGN_IN_FAILED, "invalid email or password")
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "invalid email or password")
 		return
 	}
 
 	// validate password with password digest
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordDigest), []byte(req.Password))
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_SIGN_IN_FAILED, "invalid email or password")
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "invalid email or password")
 		return
 	}
 
