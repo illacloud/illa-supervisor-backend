@@ -25,7 +25,7 @@ type Config struct {
 	DriveAccessKeyID      string `env:"ILLA_DRIVE_ACCESS_KEY_ID"      envDefault:"minioadmin"`
 	DriveAccessKeySecret  string `env:"ILLA_DRIVE_ACCESS_KEY_SECRET"  envDefault:"minioadmin"`
 	DriveRegion           string `env:"ILLA_DRIVE_REGION"             envDefault:""`
-	DriveEndpoint         string `env:"ILLA_DRIVE_ENDPOINT"           envDefault:"127.0.0.1"`
+	DriveEndpoint         string `env:"ILLA_DRIVE_ENDPOINT"           envDefault:"127.0.0.1:9000"`
 	DriveSystemBucketName string `env:"ILLA_DRIVE_SYSTEM_BUCKET_NAME" envDefault:"illa-supervisor"`
 	DriveTeamBucketName   string `env:"ILLA_DRIVE_TEAM_BUCKET_NAME"   envDefault:"illa-supervisor-team"`
 	DriveUploadTimeoutRaw string `env:"ILLA_DRIVE_UPLOAD_TIMEOUT"     envDefault:"30s"`
