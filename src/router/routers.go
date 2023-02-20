@@ -25,6 +25,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	usersRouter := routerGroup.Group("/users")
 	teamsRouter := routerGroup.Group("/teams")
 	joinRouter := routerGroup.Group("/join")
+	statusRouter := routerGroup.Group("/status")
 
 	// register auth
 	usersRouter.Use(r.Authenticator.JWTAuth())
@@ -71,5 +72,8 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	teamsRouter.GET("/:teamID/shareAppLink/userRole/:userRole/apps/:appID", r.Controller.GenerateInviteLink)
 	teamsRouter.GET("/:teamID/newShareAppLink/userRole/:userRole/apps/:appID", r.Controller.RenewInviteLink)
 	teamsRouter.POST("/:teamID/shareAppByEmail", r.Controller.InviteMemberByEmail)
+
+	// status router
+	statusRouter.GET("", r.Controller.Status)
 
 }
