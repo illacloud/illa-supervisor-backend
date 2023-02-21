@@ -308,7 +308,7 @@ func PickUpUserIDsInUserMembers(teamMembers []*TeamMember) []int {
 }
 
 type TeamMemberPermission struct {
-	Config int
+	Config int `json:"config"`
 }
 
 func NewTeamMemberPermission() *TeamMemberPermission {
