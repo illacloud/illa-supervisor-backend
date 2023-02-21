@@ -2,6 +2,7 @@ package minio
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -12,6 +13,7 @@ import (
 )
 
 const MINIO_DEFAULT_SERVE_ADDRESS = "http://127.0.0.1:9000/"
+const DEFAULT_PUBLIC_POLICY = `{"Version": "2012-10-17","Statement": [{"Action": ["s3:GetObject"],"Effect": "Allow","Principal": {"AWS": ["*"]},"Resource": ["arn:aws:s3:::%s/*"],"Sid": ""}]}`
 
 type MINIOConfig struct {
 	AccessKeyID     string
@@ -81,6 +83,12 @@ func (s3Drive *S3Drive) initDefaultBucket() {
 		}
 	} else {
 		log.Printf("Successfully created bucket \"%s\"\n", bucketName)
+	}
+	// set policy
+	policy := fmt.Sprintf(DEFAULT_PUBLIC_POLICY, bucketName)
+	errInSetPloicy := s3Drive.Instance.SetBucketPolicy(context.Background(), bucketName, policy)
+	if errInSetPloicy != nil {
+		log.Fatalln(errInSetPloicy)
 	}
 }
 
