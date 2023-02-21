@@ -3,12 +3,15 @@ package minio
 import (
 	"context"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
+
+const MINIO_DEFAULT_SERVE_ADDRESS = "http://127.0.0.1:7100/"
 
 type MINIOConfig struct {
 	AccessKeyID     string
@@ -81,6 +84,10 @@ func (s3Drive *S3Drive) initDefaultBucket() {
 	}
 }
 
+func formatPresignedURLForSelfHostEnv(rawPresignedURL string) string {
+	return strings.Replace(rawPresignedURL, MINIO_DEFAULT_SERVE_ADDRESS, "/object-storage/", -1)
+}
+
 func (s3Drive *S3Drive) GetPreSignedPutURL(fileName string) (string, error) {
 	ctx := context.Background()
 	// get put request
@@ -88,5 +95,5 @@ func (s3Drive *S3Drive) GetPreSignedPutURL(fileName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return presignedURL.String(), nil
+	return formatPresignedURLForSelfHostEnv(presignedURL.String()), nil
 }

@@ -383,9 +383,9 @@ func (controller *Controller) GetUserAvatarUploadAddress(c *gin.Context) {
 	return
 }
 
-func (controller *Controller) UpdateUsername(c *gin.Context) {
+func (controller *Controller) UpdateNickname(c *gin.Context) {
 	// get request body
-	req := model.NewUpdateUsernameRequest()
+	req := model.NewUpdateNicknameRequest()
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_PARSE_REQUEST_BODY_FAILED, "parse request body error: "+err.Error())
 		return
@@ -417,7 +417,7 @@ func (controller *Controller) UpdateUsername(c *gin.Context) {
 	}
 
 	// ok, feedback
-	controller.FeedbackOK(c, model.NewUpdateNicknameResponseByUser(user))
+	controller.FeedbackOK(c, model.NewUpdateUserResponse(user))
 	return
 }
 
@@ -455,7 +455,7 @@ func (controller *Controller) UpdateAvatar(c *gin.Context) {
 	}
 
 	// ok, feedback
-	controller.FeedbackOK(c, nil)
+	controller.FeedbackOK(c, model.NewUpdateUserResponse(user))
 	return
 }
 
@@ -542,7 +542,7 @@ func (controller *Controller) UpdateLanguage(c *gin.Context) {
 	}
 
 	// ok, feedback
-	controller.FeedbackOK(c, nil)
+	controller.FeedbackOK(c, model.NewUpdateUserResponse(user))
 	return
 }
 
