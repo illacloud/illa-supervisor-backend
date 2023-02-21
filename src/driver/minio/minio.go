@@ -11,7 +11,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-const MINIO_DEFAULT_SERVE_ADDRESS = "http://127.0.0.1:7100/"
+const MINIO_DEFAULT_SERVE_ADDRESS = "http://127.0.0.1:9000/"
 
 type MINIOConfig struct {
 	AccessKeyID     string
