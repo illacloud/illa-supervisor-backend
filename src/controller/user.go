@@ -417,7 +417,7 @@ func (controller *Controller) UpdateUsername(c *gin.Context) {
 	}
 
 	// ok, feedback
-	controller.FeedbackOK(c, nil)
+	controller.FeedbackOK(c, model.NewUpdateNicknameResponseByUser(user))
 	return
 }
 
