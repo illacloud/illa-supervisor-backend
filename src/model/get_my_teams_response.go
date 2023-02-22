@@ -19,7 +19,7 @@ type MyTeam struct {
 	Identifier           string                `json:"identifier"`
 	Icon                 string                `json:"icon"`
 	MyRole               int                   `json:"myRole"`
-	TeamMemberID         int                   `json:"teamMemberID"`
+	TeamMemberID         string                `json:"teamMemberID"`
 	TeamMemberPermission *TeamMemberPermission `json:"teamMemberPermission"`
 	TeamPermission       *TeamPermission       `json:"permission"`
 	JoinedAt             time.Time             `json:"-"`

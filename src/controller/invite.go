@@ -509,14 +509,15 @@ func (controller *Controller) JoinByLink(c *gin.Context) {
 		}
 	}
 
+	// get team
+	team, err := controller.Storage.TeamStorage.RetrieveByID(inviteRecord.ExportTeamID())
+	if err != nil {
+		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		return
+	}
+
 	// check if team closed invite by link permission
 	if inviteRecord.IsInviteLink() {
-		// get team by id
-		team, err := controller.Storage.TeamStorage.RetrieveByID(inviteRecord.ExportTeamID())
-		if err != nil {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
-			return
-		}
 		// check team permission config
 		tp := team.ExportTeamPermission()
 		if !tp.DoesInviteLinkEnabled() {
@@ -551,7 +552,7 @@ func (controller *Controller) JoinByLink(c *gin.Context) {
 	}
 
 	// feedback
-	controller.FeedbackOK(c, nil)
+	controller.FeedbackOK(c, model.NewGetTeamByTeamIDResponse(team))
 	return
 
 }
