@@ -86,6 +86,7 @@ func (s3Drive *S3Drive) initDefaultBucket() {
 	}
 	// set policy
 	policy := fmt.Sprintf(DEFAULT_PUBLIC_POLICY, bucketName)
+	fmt.Printf("policy: %v\n", policy)
 	errInSetPloicy := s3Drive.Instance.SetBucketPolicy(context.Background(), bucketName, policy)
 	if errInSetPloicy != nil {
 		log.Fatalln(errInSetPloicy)

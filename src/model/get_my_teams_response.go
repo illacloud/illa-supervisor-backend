@@ -37,7 +37,7 @@ func NewGetMyTeamsResponse(teams []*Team, teamMembersLT map[int]*TeamMemberForEx
 			Identifier:           team.Identifier,
 			Icon:                 team.Icon,
 			MyRole:               targetTeamMember.UserRole,
-			TeamMemberID:         targetTeamMember.ID,
+			TeamMemberID:         idconvertor.ConvertIntToString(targetTeamMember.ID),
 			TeamMemberPermission: targetTeamMember.Permission,
 			TeamPermission:       team.ExportTeamPermission(),
 			JoinedAt:             targetTeamMember.CreatedAt,
