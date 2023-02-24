@@ -9,10 +9,10 @@ import (
 )
 
 type GetMyTeamsResponse struct {
-	MyTeams []*MyTeam
+	MyTeams []*MyTeamResponse
 }
 
-type MyTeam struct {
+type MyTeamResponse struct {
 	ID                   string                `json:"id"`
 	UID                  uuid.UUID             `json:"uid"`
 	Name                 string                `json:"name"`
@@ -25,8 +25,8 @@ type MyTeam struct {
 	JoinedAt             time.Time             `json:"-"`
 }
 
-func NewMyTeam(team *Team, targetTeamMember *TeamMember) *MyTeam {
-	return &MyTeam{
+func NewMyTeamResponse(team *Team, targetTeamMember *TeamMember) *MyTeamResponse {
+	return &MyTeamResponse{
 		ID:                   idconvertor.ConvertIntToString(team.ID),
 		UID:                  team.UID,
 		Name:                 team.Name,
@@ -40,7 +40,7 @@ func NewMyTeam(team *Team, targetTeamMember *TeamMember) *MyTeam {
 	}
 }
 
-func (resp *MyTeam) ExportForFeedback() interface{} {
+func (resp *MyTeamResponse) ExportForFeedback() interface{} {
 	return resp
 }
 
@@ -49,7 +49,7 @@ func NewGetMyTeamsResponse(teams []*Team, teamMembersLT map[int]*TeamMemberForEx
 	ret := &GetMyTeamsResponse{}
 	for _, team := range teams {
 		targetTeamMember := teamMembersLT[team.ID]
-		myTeam := &MyTeam{
+		myTeam := &MyTeamResponse{
 			ID:                   idconvertor.ConvertIntToString(team.ID),
 			UID:                  team.UID,
 			Name:                 team.Name,
