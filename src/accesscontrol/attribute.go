@@ -319,7 +319,9 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_INVITE: {ACTION_SPECIAL_INVITE_LINK_RENEW: true},
 			UNIT_TYPE_APP:    {ACTION_SPECIAL_RELEASE_APP: true},
 		},
-		USER_ROLE_EDITOR: {},
+		USER_ROLE_EDITOR: {
+			UNIT_TYPE_APP: {ACTION_SPECIAL_RELEASE_APP: true},
+		},
 		USER_ROLE_VIEWER: {},
 	},
 }
