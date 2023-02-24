@@ -25,6 +25,25 @@ type MyTeam struct {
 	JoinedAt             time.Time             `json:"-"`
 }
 
+func NewMyTeam(team *Team, targetTeamMember *TeamMember) *MyTeam {
+	return &MyTeam{
+		ID:                   idconvertor.ConvertIntToString(team.ID),
+		UID:                  team.UID,
+		Name:                 team.Name,
+		Identifier:           team.Identifier,
+		Icon:                 team.Icon,
+		MyRole:               targetTeamMember.UserRole,
+		TeamMemberID:         idconvertor.ConvertIntToString(targetTeamMember.ID),
+		TeamMemberPermission: targetTeamMember.ExportPermission(),
+		TeamPermission:       team.ExportTeamPermission(),
+		JoinedAt:             targetTeamMember.CreatedAt,
+	}
+}
+
+func (resp *MyTeam) ExportForFeedback() interface{} {
+	return resp
+}
+
 func NewGetMyTeamsResponse(teams []*Team, teamMembersLT map[int]*TeamMemberForExport) *GetMyTeamsResponse {
 	// build team  members lookup table
 	ret := &GetMyTeamsResponse{}

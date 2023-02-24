@@ -552,7 +552,7 @@ func (controller *Controller) JoinByLink(c *gin.Context) {
 	}
 
 	// feedback
-	controller.FeedbackOK(c, model.NewGetTeamByTeamIDResponse(team))
+	controller.FeedbackOK(c, model.NewMyTeam(team, teamMember))
 	return
 
 }
