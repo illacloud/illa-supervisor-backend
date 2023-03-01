@@ -23,8 +23,8 @@ jobs:
             else
               echo ${CIRCLE_BRANCH}
               echo "export IMAGE_TAG=${CIRCLE_BRANCH}" >> "$BASH_ENV"
-              echo "export FE=${CIRCLE_BRANCH}" >> "$BASH_ENV"
-              echo "export BE=${CIRCLE_BRANCH}" >> "$BASH_ENV"
+              echo "export FE=develop" >> "$BASH_ENV"
+              echo "export BE=develop" >> "$BASH_ENV"
               echo "export SBE=${CIRCLE_BRANCH}" >> "$BASH_ENV"
             fi
       - run:
