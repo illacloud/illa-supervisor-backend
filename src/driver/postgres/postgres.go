@@ -13,11 +13,11 @@ import (
 const RETRY_TIMES = 6
 
 type PostgresConfig struct {
-	Addr     string `env:"ILLA_PG_ADDR" envDefault:"localhost"`
-	Port     string `env:"ILLA_PG_PORT" envDefault:"5432"`
-	User     string `env:"ILLA_PG_USER" envDefault:"illa_supervisor"`
-	Password string `env:"ILLA_PG_PASSWORD" envDefault:"illa2022"`
-	Database string `env:"ILLA_PG_DATABASE" envDefault:"illa_supervisor"`
+	Addr     string `env:"ILLA_SUPERVISOR_PG_ADDR" envDefault:"localhost"`
+	Port     string `env:"ILLA_SUPERVISOR_PG_PORT" envDefault:"5432"`
+	User     string `env:"ILLA_SUPERVISOR_PG_USER" envDefault:"illa_supervisor"`
+	Password string `env:"ILLA_SUPERVISOR_PG_PASSWORD" envDefault:"illa2022"`
+	Database string `env:"ILLA_SUPERVISOR_PG_DATABASE" envDefault:"illa_supervisor"`
 }
 
 func GetPostgresConfig() (*PostgresConfig, error) {
