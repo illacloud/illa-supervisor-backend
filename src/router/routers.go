@@ -46,6 +46,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	usersRouter.PATCH("/nickname", r.Controller.UpdateNickname)
 	usersRouter.PATCH("/avatar", r.Controller.UpdateAvatar)
 	usersRouter.PATCH("/language", r.Controller.UpdateLanguage)
+	usersRouter.PATCH("/tutorialViewed", r.Controller.UpdateIsTutorialViewed)
 	usersRouter.DELETE("", r.Controller.DeleteUser)
 
 	// teams routers
