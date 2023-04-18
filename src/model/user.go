@@ -114,6 +114,13 @@ func (u *User) SetLanguage(language string) {
 	u.InitUpdatedAt()
 }
 
+func (u *User) SetIsTutorialViewed(isTutorialViewed bool) {
+	userCustomization := u.ExportUserCustomization()
+	userCustomization.SetIsTutorialViewed(isTutorialViewed)
+	u.SetUserCustomization(userCustomization)
+	u.InitUpdatedAt()
+}
+
 func (u *User) SetUserCustomization(userCustomization *UserCustomization) {
 	u.Customization, _ = userCustomization.Export()
 }
@@ -242,21 +249,24 @@ func (u *User) ExportUserCustomization() *UserCustomization {
 }
 
 type UserCustomization struct {
-	Language     string
-	IsSubscribed bool
+	Language         string
+	IsSubscribed     bool
+	IsTutorialViewed bool
 }
 
 func NewUserCustomization() *UserCustomization {
 	return &UserCustomization{
-		Language:     CUSTOMIZATION_LANGUAGE_EN_US,
-		IsSubscribed: false,
+		Language:         CUSTOMIZATION_LANGUAGE_EN_US,
+		IsSubscribed:     false,
+		IsTutorialViewed: false,
 	}
 }
 
 func NewUserCustomizationBySignUpRequest(req *SignUpRequest) *UserCustomization {
 	return &UserCustomization{
-		Language:     req.Language,
-		IsSubscribed: req.IsSubscribed,
+		Language:         req.Language,
+		IsSubscribed:     req.IsSubscribed,
+		IsTutorialViewed: req.IsTutorialViewed,
 	}
 }
 
@@ -274,6 +284,10 @@ func (c *UserCustomization) SetLanguage(language string) {
 
 func (c *UserCustomization) SetIsSubscribed(isSubscribed bool) {
 	c.IsSubscribed = isSubscribed
+}
+
+func (c *UserCustomization) SetIsTutorialViewed(isTutorialViewed bool) {
+	c.IsTutorialViewed = isTutorialViewed
 }
 
 func BuildLookUpTableForUserExport(users []*User) map[int]*UserForExport {
