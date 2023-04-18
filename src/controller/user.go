@@ -546,6 +546,44 @@ func (controller *Controller) UpdateLanguage(c *gin.Context) {
 	return
 }
 
+func (controller *Controller) UpdateIsTutorialViewed(c *gin.Context) {
+	// get request body
+	req := model.NewUpdateIsTutorialViewedRequest()
+	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_PARSE_REQUEST_BODY_FAILED, "parse request body error: "+err.Error())
+		return
+	}
+
+	// validate payload required fields
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_BODY_FAILED, "validate request body error: "+err.Error())
+		return
+	}
+
+	// get user by id
+	userID, errInGetUserID := controller.GetUserIDFromAuth(c)
+	if errInGetUserID != nil {
+		return
+	}
+	user, err := controller.Storage.UserStorage.RetrieveByID(userID)
+	if err != nil {
+		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		return
+	}
+
+	// update user language
+	user.SetIsTutorialViewed(req.IsTutorialViewed)
+	if err := controller.Storage.UserStorage.UpdateByID(user); err != nil {
+		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update isTutorialViewed error: "+err.Error())
+		return
+	}
+
+	// ok, feedback
+	controller.FeedbackOK(c, nil)
+	return
+}
+
 func (controller *Controller) CreateUser(c *gin.Context) {
 	// get request body
 	CreateUserRequest := model.NewCreateUserRequest()
