@@ -8,7 +8,7 @@ import (
 )
 
 type GetUserByIDResponse struct {
-	ID               string    `json:"id"`
+	ID               string    `json:"userID"`
 	UID              uuid.UUID `json:"uid"`
 	Nickname         string    `json:"nickname"`
 	Email            string    `json:"email"`
