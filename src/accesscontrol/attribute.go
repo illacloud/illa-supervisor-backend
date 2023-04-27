@@ -231,7 +231,6 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_JOB:               {ACTION_DELETE: true},
 		},
 		USER_ROLE_ADMIN: {
-			UNIT_TYPE_TEAM:              {ACTION_DELETE: true},
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_DELETE: true},
 			UNIT_TYPE_USER:              {ACTION_DELETE: true},
 			UNIT_TYPE_INVITE:            {ACTION_DELETE: true},
