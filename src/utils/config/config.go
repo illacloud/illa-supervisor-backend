@@ -21,6 +21,18 @@ type Config struct {
 	DeployMode         string `env:"ILLA_DEPLOY_MODE"              envDefault:"self-host"`
 	ServeHTTPS         string `env:"ILLA_DEPLOY_SERVE_HTTPS"       envDefault:"false"`
 
+	// storage config
+	PostgresAddr     string `env:"ILLA_PG_ADDR" envDefault:"localhost"`
+	PostgresPort     string `env:"ILLA_PG_PORT" envDefault:"5433"`
+	PostgresUser     string `env:"ILLA_PG_USER" envDefault:"illa_cloud"`
+	PostgresPassword string `env:"ILLA_PG_PASSWORD" envDefault:"illa2022"`
+	PostgresDatabase string `env:"ILLA_PG_DATABASE" envDefault:"illa_cloud"`
+	// cache config
+	RedisAddr     string `env:"ILLA_REDIS_ADDR" envDefault:"localhost"`
+	RedisPort     string `env:"ILLA_REDIS_PORT" envDefault:"6379"`
+	RedisPassword string `env:"ILLA_REDIS_PASSWORD" envDefault:"illa2022"`
+	RedisDatabase int    `env:"ILLA_REDIS_DATABASE" envDefault:"0"`
+
 	// drive config
 	DriveType             string `env:"ILLA_DRIVE_TYPE"               envDefault:""`
 	DriveAccessKeyID      string `env:"ILLA_DRIVE_ACCESS_KEY_ID"      envDefault:"minioadmin"`
@@ -79,6 +91,42 @@ func (c *Config) GetServeHTTPAddress() string {
 		return "https://" + c.ServerHost
 	}
 	return "http://" + c.ServerHost
+}
+
+func (c *Config) GetPostgresAddr() string {
+	return c.PostgresAddr
+}
+
+func (c *Config) GetPostgresPort() string {
+	return c.PostgresPort
+}
+
+func (c *Config) GetPostgresUser() string {
+	return c.PostgresUser
+}
+
+func (c *Config) GetPostgresPassword() string {
+	return c.PostgresPassword
+}
+
+func (c *Config) GetPostgresDatabase() string {
+	return c.PostgresDatabase
+}
+
+func (c *Config) GetRedisAddr() string {
+	return c.RedisAddr
+}
+
+func (c *Config) GetRedisPort() string {
+	return c.RedisPort
+}
+
+func (c *Config) GetRedisPassword() string {
+	return c.RedisPassword
+}
+
+func (c *Config) GetRedisDatabase() int {
+	return c.RedisDatabase
 }
 
 func (c *Config) GetDriveType() string {
