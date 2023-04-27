@@ -23,14 +23,14 @@ type Config struct {
 
 	// storage config
 	PostgresAddr     string `env:"ILLA_PG_ADDR" envDefault:"localhost"`
-	PostgresPort     string `env:"ILLA_PG_PORT" envDefault:"5433"`
+	PostgresPort     string `env:"ILLA_PG_PORT" envDefault:"5432"`
 	PostgresUser     string `env:"ILLA_PG_USER" envDefault:"illa_cloud"`
 	PostgresPassword string `env:"ILLA_PG_PASSWORD" envDefault:"illa2022"`
 	PostgresDatabase string `env:"ILLA_PG_DATABASE" envDefault:"illa_cloud"`
 	// cache config
 	RedisAddr     string `env:"ILLA_REDIS_ADDR" envDefault:"localhost"`
 	RedisPort     string `env:"ILLA_REDIS_PORT" envDefault:"6379"`
-	RedisPassword string `env:"ILLA_REDIS_PASSWORD" envDefault:"illa2022"`
+	RedisPassword string `env:"ILLA_REDIS_PASSWORD" envDefault:""`
 	RedisDatabase int    `env:"ILLA_REDIS_DATABASE" envDefault:"0"`
 
 	// drive config
