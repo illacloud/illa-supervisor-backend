@@ -25,6 +25,7 @@ type AuthClaims struct {
 
 type Authenticator struct {
 	Storage *model.Storage
+	Cache   *model.Cache
 }
 
 func NewAuthenticator(storage *model.Storage, cache *model.Cache) *Authenticator {
