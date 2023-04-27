@@ -22,11 +22,11 @@ type Config struct {
 	ServeHTTPS         string `env:"ILLA_DEPLOY_SERVE_HTTPS"       envDefault:"false"`
 
 	// storage config
-	PostgresAddr     string `env:"ILLA_PG_ADDR" envDefault:"localhost"`
-	PostgresPort     string `env:"ILLA_PG_PORT" envDefault:"5432"`
-	PostgresUser     string `env:"ILLA_PG_USER" envDefault:"illa_cloud"`
-	PostgresPassword string `env:"ILLA_PG_PASSWORD" envDefault:"illa2022"`
-	PostgresDatabase string `env:"ILLA_PG_DATABASE" envDefault:"illa_cloud"`
+	PostgresAddr     string `env:"ILLA_SUPERVISOR_PG_ADDR" envDefault:"localhost"`
+	PostgresPort     string `env:"ILLA_SUPERVISOR_PG_PORT" envDefault:"5432"`
+	PostgresUser     string `env:"ILLA_SUPERVISOR_PG_USER" envDefault:"illa_supervisor"`
+	PostgresPassword string `env:"ILLA_SUPERVISOR_PG_PASSWORD" envDefault:"illa2022"`
+	PostgresDatabase string `env:"ILLA_SUPERVISOR_PG_DATABASE" envDefault:"illa_supervisor"`
 	// cache config
 	RedisAddr     string `env:"ILLA_REDIS_ADDR" envDefault:"localhost"`
 	RedisPort     string `env:"ILLA_REDIS_PORT" envDefault:"6379"`
