@@ -158,7 +158,7 @@ alter table unit_role_relations owner to illa_supervisor;
 INSERT INTO teams ( 
     id, uid, name, identifier, icon, permission, created_at, updated_at
 ) VALUES (
-    0, '00000000-0000-0000-0000-000000000000', 'my-team'    , '0'  , 'https://illa.s3.ap-northeast-1.amazonaws.com/illa-cloud/people.png', to_jsonb('{"allowEditorInvite": true, "allowViewerInvite": true, "inviteLinkEnabled": true, "allowEditorManageTeamMember": true, "allowViewerManageTeamMember": true}'::text), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+    0, '00000000-0000-0000-0000-000000000000', 'my-team'    , '0'  , 'https://cdn.illacloud.com/email-template/people.png', to_jsonb('{"allowEditorInvite": true, "allowViewerInvite": true, "inviteLinkEnabled": true, "allowEditorManageTeamMember": true, "allowViewerManageTeamMember": true}'::text), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 );
 
 INSERT INTO users (

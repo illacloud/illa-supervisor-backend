@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/caarlos0/env"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,10 +20,15 @@ type PostgresConfig struct {
 	Database string `env:"ILLA_SUPERVISOR_PG_DATABASE" envDefault:"illa_supervisor"`
 }
 
-func GetPostgresConfig() (*PostgresConfig, error) {
-	config := &PostgresConfig{}
-	err := env.Parse(config)
-	return config, err
+func NewPostgresConnectionByGlobalConfig(config *config.Config, logger *zap.SugaredLogger) (*gorm.DB, error) {
+	postgresConfig := &PostgresConfig{
+		Addr:     config.GetPostgresAddr(),
+		Port:     config.GetPostgresPort(),
+		User:     config.GetPostgresUser(),
+		Password: config.GetPostgresPassword(),
+		Database: config.GetPostgresDatabase(),
+	}
+	return NewPostgresConnection(postgresConfig, logger)
 }
 
 func NewPostgresConnection(config *PostgresConfig, logger *zap.SugaredLogger) (*gorm.DB, error) {

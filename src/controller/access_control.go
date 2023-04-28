@@ -21,7 +21,7 @@ func (controller *Controller) ValidateAccount(c *gin.Context) {
 	}
 
 	// validate account
-	a := authenticator.NewAuthenticator(controller.Storage)
+	a := controller.Authenticator
 	if _, err := a.ManualAuth(authorizationToken); err != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_ACCOUNT_FAILED, "validate account failed: "+err.Error())
 		return

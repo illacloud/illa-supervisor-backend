@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/illacloud/illa-supervisor-backend/src/authenticator"
 	"github.com/illacloud/illa-supervisor-backend/src/model"
 )
 
@@ -40,14 +41,15 @@ func (controller *Controller) GetVerificationCode(c *gin.Context) {
 
 // user sign-up
 // signup  							    -> check if email was used
-//        <> with email invite token    -> check invite_token
-//                                      -  create user
-//                                      -  update team_member
-//                                      -  delete invite_token
-//        <> with link invite token     -> check invite_token
-//                                      -  create team_member
-//                                      -  create user
-//        <> without token 				-> create user
+//
+//	<> with email invite token    -> check invite_token
+//	                              -  create user
+//	                              -  update team_member
+//	                              -  delete invite_token
+//	<> with link invite token     -> check invite_token
+//	                              -  create team_member
+//	                              -  create user
+//	<> without token 				-> create user
 func (controller *Controller) SignUp(c *gin.Context) {
 	// get request body
 	req := model.NewSignUpRequest()
@@ -113,14 +115,14 @@ func (controller *Controller) SignUp(c *gin.Context) {
 }
 
 // - execute invite phrase
-//     - check request email match invite record email
-//     - create user
-//     - fetch teamMember record
-//     - set teamMember active
-//     - update teamMember record
-//     - delete invite record
-//     - generate access token
-//     - feedback
+//   - check request email match invite record email
+//   - create user
+//   - fetch teamMember record
+//   - set teamMember active
+//   - update teamMember record
+//   - delete invite record
+//   - generate access token
+//   - feedback
 func (controller *Controller) signUpWithEmailToken(req *model.SignUpRequest, inviteRecord *model.Invite, c *gin.Context) {
 	// check if signup request email does not match invite record email
 	if req.ExportEmail() != inviteRecord.ExportEmail() {
@@ -164,6 +166,16 @@ func (controller *Controller) signUpWithEmailToken(req *model.SignUpRequest, inv
 
 	// generate access token and refresh token
 	accessToken, _ := model.CreateAccessToken(user.ID, user.UID)
+	expiredAtString, errInExtract := authenticator.ExtractExpiresAtFromTokenInString(accessToken)
+	if errInExtract != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "check token expired at failed")
+		return
+	}
+	errInCacheTokenExpiredAt := controller.Cache.JWTCache.InitUserJWTTokenExpiredAt(user, expiredAtString)
+	if errInCacheTokenExpiredAt != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "cache token expired at failed")
+		return
+	}
 	c.Header("illa-token", accessToken)
 
 	// ok, feedback
@@ -212,6 +224,16 @@ func (controller *Controller) signUpWithLinkToken(req *model.SignUpRequest, invi
 
 	// generate access token and refresh token
 	accessToken, _ := model.CreateAccessToken(user.ID, user.UID)
+	expiredAtString, errInExtract := authenticator.ExtractExpiresAtFromTokenInString(accessToken)
+	if errInExtract != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "check token expired at failed")
+		return
+	}
+	errInCacheTokenExpiredAt := controller.Cache.JWTCache.InitUserJWTTokenExpiredAt(user, expiredAtString)
+	if errInCacheTokenExpiredAt != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "cache token expired at failed")
+		return
+	}
 	c.Header("illa-token", accessToken)
 
 	// ok, feedback
@@ -253,6 +275,16 @@ func (controller *Controller) signUpWithoutToken(req *model.SignUpRequest, c *gi
 
 	// generate access token and refresh token
 	accessToken, _ := model.CreateAccessToken(user.ID, user.UID)
+	expiredAtString, errInExtract := authenticator.ExtractExpiresAtFromTokenInString(accessToken)
+	if errInExtract != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "check token expired at failed")
+		return
+	}
+	errInCacheTokenExpiredAt := controller.Cache.JWTCache.InitUserJWTTokenExpiredAt(user, expiredAtString)
+	if errInCacheTokenExpiredAt != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "cache token expired at failed")
+		return
+	}
 	c.Header("illa-token", accessToken)
 
 	// ok, feedback
@@ -290,8 +322,18 @@ func (controller *Controller) SignIn(c *gin.Context) {
 		return
 	}
 
-	// generate and refresh access token
+	// generate access token and refresh token
 	accessToken, _ := model.CreateAccessToken(user.ID, user.UID)
+	expiredAtString, errInExtract := authenticator.ExtractExpiresAtFromTokenInString(accessToken)
+	if errInExtract != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "check token expired at failed")
+		return
+	}
+	errInCacheTokenExpiredAt := controller.Cache.JWTCache.InitUserJWTTokenExpiredAt(user, expiredAtString)
+	if errInCacheTokenExpiredAt != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "cache token expired at failed")
+		return
+	}
 	c.Header("illa-token", accessToken)
 
 	// ok, feedback
@@ -347,6 +389,22 @@ func (controller *Controller) ForgetPassword(c *gin.Context) {
 }
 
 func (controller *Controller) Logout(c *gin.Context) {
+	// get user by id
+	userID, errInGetUserID := controller.GetUserIDFromAuth(c)
+	if errInGetUserID != nil {
+		return
+	}
+	user, err := controller.Storage.UserStorage.RetrieveByID(userID)
+	if err != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		return
+	}
+	// clean jwt expireAt token
+	errInDeleteTokenExpiredAt := controller.Cache.JWTCache.CleanUserJWTTokenExpiredAt(user)
+	if errInDeleteTokenExpiredAt != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SIGN_IN_FAILED, "clean token expired at cache failed")
+		return
+	}
 	// @todo: logout method
 	c.JSON(http.StatusOK, nil)
 	return
