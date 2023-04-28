@@ -7,6 +7,7 @@ import (
 	"github.com/illacloud/illa-supervisor-backend/src/controller"
 	"github.com/illacloud/illa-supervisor-backend/src/driver/minio"
 	"github.com/illacloud/illa-supervisor-backend/src/driver/postgres"
+	"github.com/illacloud/illa-supervisor-backend/src/driver/redis"
 	"github.com/illacloud/illa-supervisor-backend/src/internalrouter"
 	"github.com/illacloud/illa-supervisor-backend/src/model"
 	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
@@ -35,6 +36,23 @@ func NewServer(config *config.Config, engine *gin.Engine, router *internalrouter
 	}
 }
 
+func initStorage(globalConfig *config.Config, logger *zap.SugaredLogger) *model.Storage {
+	postgresDriver, err := postgres.NewPostgresConnectionByGlobalConfig(globalConfig, logger)
+	if err != nil {
+		logger.Errorw("Error in startup, storage init failed.")
+	}
+	return model.NewStorage(postgresDriver, logger)
+}
+
+func initCache(globalConfig *config.Config, logger *zap.SugaredLogger) *model.Cache {
+	redisDriver, err := redis.NewRedisConnectionByGlobalConfig(globalConfig, logger)
+	if err != nil {
+		logger.Errorw("Error in startup, cache init failed.")
+	}
+	return model.NewCache(redisDriver, logger)
+
+}
+
 func initDrive(globalConfig *config.Config, logger *zap.SugaredLogger) *model.Drive {
 	systemMINIOConfig := minio.NewSystemMINIOConfigByGlobalConfig(globalConfig)
 	teamMINIOConfig := minio.NewTeamMINIOConfigByGlobalConfig(globalConfig)
@@ -53,24 +71,20 @@ func initServer() (*Server, error) {
 	}
 	engine := gin.New()
 	sugaredLogger := logger.NewSugardLogger()
-	// init storage
-	postgresConfig, err := postgres.GetPostgresConfig()
-	if err != nil {
-		return nil, err
-	}
-	postgresDriver, err := postgres.NewPostgresConnection(postgresConfig, sugaredLogger)
-	if err != nil {
-		return nil, err
-	}
+
 	// init validator
 	validator, err := tokenvalidator.NewRequestTokenValidator()
 	if err != nil {
 		return nil, err
 	}
-	storage := model.NewStorage(postgresDriver, sugaredLogger)
+
+	// init driver
+	storage := initStorage(globalConfig, sugaredLogger)
+	cache := initCache(globalConfig, sugaredLogger)
 	drive := initDrive(globalConfig, sugaredLogger)
-	c := controller.NewController(storage, drive, validator)
-	a := authenticator.NewAuthenticator(storage)
+
+	a := authenticator.NewAuthenticator(storage, cache)
+	c := controller.NewController(storage, cache, drive, validator, a)
 	router := internalrouter.NewRouter(c, a)
 	server := NewServer(globalConfig, engine, router, sugaredLogger)
 	return server, nil

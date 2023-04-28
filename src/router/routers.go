@@ -37,7 +37,6 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	authRouter.POST("/signup", r.Controller.SignUp)
 	authRouter.POST("/signin", r.Controller.SignIn)
 	authRouter.POST("/forgetPassword", r.Controller.ForgetPassword)
-	authRouter.POST("/logout", r.Controller.Logout)
 
 	// user routers
 	usersRouter.GET("", r.Controller.RetrieveUserByID)
@@ -48,6 +47,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	usersRouter.PATCH("/language", r.Controller.UpdateLanguage)
 	usersRouter.PATCH("/tutorialViewed", r.Controller.UpdateIsTutorialViewed)
 	usersRouter.DELETE("", r.Controller.DeleteUser)
+	usersRouter.POST("/logout", r.Controller.Logout)
 
 	// teams routers
 	teamsRouter.GET("/my", r.Controller.GetMyTeams)
