@@ -1,6 +1,9 @@
 package accesscontrol
 
+import "github.com/illacloud/illa-supervisor-backend/src/model"
+
 // default
+const ANONYMOUS_AUTH_TOKEN = ""
 const DEFAULT_TEAM_ID = 0
 const DEFAULT_UNIT_ID = 0
 
@@ -12,28 +15,31 @@ const STATUS_SUSPEND = 3
 // Attirbute Unit List
 // Attirbute Unit List
 const (
-	UNIT_TYPE_TEAM              = iota + 1 // cloud team
-	UNIT_TYPE_TEAM_MEMBER                  // cloud team member
-	UNIT_TYPE_USER                         // cloud user
-	UNIT_TYPE_INVITE                       // cloud invite
-	UNIT_TYPE_DOMAIN                       // cloud domain
-	UNIT_TYPE_BILLING                      // cloud billing
-	UNIT_TYPE_BUILDER_DASHBOARD            // builder dabshboard
-	UNIT_TYPE_APP                          // builder app
-	UNIT_TYPE_COMPONENTS                   // builder components
-	UNIT_TYPE_RESOURCE                     // resource resource
-	UNIT_TYPE_ACTION                       // resource action
-	UNIT_TYPE_TRANSFORMER                  // resource transformer
-	UNIT_TYPE_JOB                          // hub job
-)
-
-// User Role ID in Team
-// @note: this will extend as role system later.
-const (
-	USER_ROLE_OWNER  = 1
-	USER_ROLE_ADMIN  = 2
-	USER_ROLE_EDITOR = 3
-	USER_ROLE_VIEWER = 4
+	UNIT_TYPE_TEAM                      = 1  // cloud team
+	UNIT_TYPE_TEAM_MEMBER               = 2  // cloud team member
+	UNIT_TYPE_USER                      = 3  // cloud user
+	UNIT_TYPE_INVITE                    = 4  // cloud invite
+	UNIT_TYPE_DOMAIN                    = 5  // cloud domain
+	UNIT_TYPE_BILLING                   = 6  // cloud billing
+	UNIT_TYPE_BUILDER_DASHBOARD         = 7  // builder dabshboard
+	UNIT_TYPE_APP                       = 8  // builder app
+	UNIT_TYPE_COMPONENTS                = 9  // builder components
+	UNIT_TYPE_RESOURCE                  = 10 // resource resource
+	UNIT_TYPE_ACTION                    = 11 // resource action
+	UNIT_TYPE_TRANSFORMER               = 12 // resource transformer
+	UNIT_TYPE_JOB                       = 13 // hub job
+	UNIT_TYPE_TREE_STATES               = 14 // components tree states
+	UNIT_TYPE_KV_STATES                 = 15 // components k-v states
+	UNIT_TYPE_SET_STATES                = 16 // components set states
+	UNIT_TYPE_PROMOTE_CODES             = 17 // promote codes
+	UNIT_TYPE_PROMOTE_CODE_USAGES       = 18 // promote codes usage table
+	UNIT_TYPE_ROLES                     = 19 // team roles table
+	UNIT_TYPE_USER_ROLE_RELATIONS       = 20 // user role relation table
+	UNIT_TYPE_UNIT_ROLE_RELATIONS       = 21 // unit role relation table
+	UNIT_TYPE_COMPENSATING_TRANSACTIONS = 22 // compensating transactions
+	UNIT_TYPE_TRANSACTION_SERIALS       = 23 // transaction serials
+	UNIT_TYPE_CAPACITIES                = 24 // capacity
+	UNIT_TYPE_DRIVE                     = 25 // drive
 )
 
 // global invite permission config
@@ -43,18 +49,18 @@ const (
 // map[nowUserRole]map[atrgetUserRole]attribute
 
 // this config map target role to target invite role attribute
-// e.g. you want invite USER_ROLE_ADMIN, so it's mapped attribute is ACTION_ACCESS_INVITE_ADMIN
+// e.g. you want invite model.USER_ROLE_ADMIN, so it's mapped attribute is ACTION_ACCESS_INVITE_ADMIN
 var InviteRoleAttributeMap = map[int]int{
-	USER_ROLE_OWNER: ACTION_ACCESS_INVITE_OWNER, USER_ROLE_ADMIN: ACTION_ACCESS_INVITE_ADMIN, USER_ROLE_EDITOR: ACTION_ACCESS_INVITE_EDITOR, USER_ROLE_VIEWER: ACTION_ACCESS_INVITE_VIEWER,
+	model.USER_ROLE_OWNER: ACTION_ACCESS_INVITE_OWNER, model.USER_ROLE_ADMIN: ACTION_ACCESS_INVITE_ADMIN, model.USER_ROLE_EDITOR: ACTION_ACCESS_INVITE_EDITOR, model.USER_ROLE_VIEWER: ACTION_ACCESS_INVITE_VIEWER,
 }
 
 // this config map target role to target manage user role attribute
-// e.g. you want modify a user to role USER_ROLE_EDITOR, so it's mapped attribute is ACTION_MANAGE_ROLE_TO_EDITOR
+// e.g. you want modify a user to role model.USER_ROLE_EDITOR, so it's mapped attribute is ACTION_MANAGE_ROLE_TO_EDITOR
 var ModifyRoleFromAttributeMap = map[int]int{
-	USER_ROLE_OWNER: ACTION_MANAGE_ROLE_FROM_OWNER, USER_ROLE_ADMIN: ACTION_MANAGE_ROLE_FROM_ADMIN, USER_ROLE_EDITOR: ACTION_MANAGE_ROLE_FROM_EDITOR, USER_ROLE_VIEWER: ACTION_MANAGE_ROLE_FROM_VIEWER,
+	model.USER_ROLE_OWNER: ACTION_MANAGE_ROLE_FROM_OWNER, model.USER_ROLE_ADMIN: ACTION_MANAGE_ROLE_FROM_ADMIN, model.USER_ROLE_EDITOR: ACTION_MANAGE_ROLE_FROM_EDITOR, model.USER_ROLE_VIEWER: ACTION_MANAGE_ROLE_FROM_VIEWER,
 }
 var MadifyRoleToAttributeMap = map[int]int{
-	USER_ROLE_OWNER: ACTION_MANAGE_ROLE_TO_OWNER, USER_ROLE_ADMIN: ACTION_MANAGE_ROLE_TO_ADMIN, USER_ROLE_EDITOR: ACTION_MANAGE_ROLE_TO_EDITOR, USER_ROLE_VIEWER: ACTION_MANAGE_ROLE_TO_VIEWER,
+	model.USER_ROLE_OWNER: ACTION_MANAGE_ROLE_TO_OWNER, model.USER_ROLE_ADMIN: ACTION_MANAGE_ROLE_TO_ADMIN, model.USER_ROLE_EDITOR: ACTION_MANAGE_ROLE_TO_EDITOR, model.USER_ROLE_VIEWER: ACTION_MANAGE_ROLE_TO_VIEWER,
 }
 
 const (
@@ -161,7 +167,11 @@ const (
 // map[AttributeCategory][role][unitType][Attribute]status
 var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 	ATTRIBUTE_CATEGORY_ACCESS: {
-		USER_ROLE_OWNER: {
+		model.USER_ROLE_ANONYMOUS: {
+			UNIT_TYPE_APP:    {ACTION_ACCESS_VIEW: true}, // only should for public app
+			UNIT_TYPE_ACTION: {ACTION_ACCESS_VIEW: true}, // only should for public action
+		},
+		model.USER_ROLE_OWNER: {
 			UNIT_TYPE_TEAM:              {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_USER:              {ACTION_ACCESS_VIEW: true},
@@ -176,7 +186,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER:       {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_JOB:               {ACTION_ACCESS_VIEW: true},
 		},
-		USER_ROLE_ADMIN: {
+		model.USER_ROLE_ADMIN: {
 			UNIT_TYPE_TEAM:              {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_USER:              {ACTION_ACCESS_VIEW: true},
@@ -190,7 +200,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER:       {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_JOB:               {ACTION_ACCESS_VIEW: true},
 		},
-		USER_ROLE_EDITOR: {
+		model.USER_ROLE_EDITOR: {
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_USER:              {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_INVITE:            {ACTION_ACCESS_VIEW: true, ACTION_ACCESS_INVITE_BY_LINK: true, ACTION_ACCESS_INVITE_BY_EMAIL: true, ACTION_ACCESS_INVITE_EDITOR: true, ACTION_ACCESS_INVITE_VIEWER: true},
@@ -202,7 +212,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER:       {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_JOB:               {ACTION_ACCESS_VIEW: true},
 		},
-		USER_ROLE_VIEWER: {
+		model.USER_ROLE_VIEWER: {
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_USER:              {ACTION_ACCESS_VIEW: true},
 			UNIT_TYPE_INVITE:            {ACTION_ACCESS_VIEW: true, ACTION_ACCESS_INVITE_BY_LINK: true, ACTION_ACCESS_INVITE_BY_EMAIL: true, ACTION_ACCESS_INVITE_VIEWER: true},
@@ -216,7 +226,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 		},
 	},
 	ATTRIBUTE_CATEGORY_DELETE: {
-		USER_ROLE_OWNER: {
+		model.USER_ROLE_OWNER: {
 			UNIT_TYPE_TEAM:              {ACTION_DELETE: true},
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_DELETE: true},
 			UNIT_TYPE_USER:              {ACTION_DELETE: true},
@@ -231,7 +241,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER:       {ACTION_DELETE: true},
 			UNIT_TYPE_JOB:               {ACTION_DELETE: true},
 		},
-		USER_ROLE_ADMIN: {
+		model.USER_ROLE_ADMIN: {
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_DELETE: true},
 			UNIT_TYPE_USER:              {ACTION_DELETE: true},
 			UNIT_TYPE_INVITE:            {ACTION_DELETE: true},
@@ -244,7 +254,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER:       {ACTION_DELETE: true},
 			UNIT_TYPE_JOB:               {ACTION_DELETE: true},
 		},
-		USER_ROLE_EDITOR: {
+		model.USER_ROLE_EDITOR: {
 			UNIT_TYPE_TEAM_MEMBER: {ACTION_DELETE: true},
 			UNIT_TYPE_USER:        {ACTION_DELETE: true},
 			UNIT_TYPE_INVITE:      {ACTION_DELETE: true},
@@ -255,13 +265,16 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER: {ACTION_DELETE: true},
 			UNIT_TYPE_JOB:         {ACTION_DELETE: true},
 		},
-		USER_ROLE_VIEWER: {
+		model.USER_ROLE_VIEWER: {
 			UNIT_TYPE_TEAM_MEMBER: {ACTION_DELETE: true},
 			UNIT_TYPE_USER:        {ACTION_DELETE: true},
 		},
 	},
 	ATTRIBUTE_CATEGORY_MANAGE: {
-		USER_ROLE_OWNER: {
+		model.USER_ROLE_ANONYMOUS: {
+			UNIT_TYPE_APP: {ACTION_MANAGE_RUN_ACTION: true},
+		},
+		model.USER_ROLE_OWNER: {
 			UNIT_TYPE_TEAM:              {ACTION_MANAGE_TEAM_NAME: true, ACTION_MANAGE_TEAM_ICON: true, ACTION_MANAGE_TEAM_CONFIG: true, ACTION_MANAGE_UPDATE_TEAM_DOMAIN: true},
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_MANAGE_REMOVE_MEMBER: true, ACTION_MANAGE_ROLE: true, ACTION_MANAGE_ROLE_FROM_OWNER: true, ACTION_MANAGE_ROLE_FROM_ADMIN: true, ACTION_MANAGE_ROLE_FROM_EDITOR: true, ACTION_MANAGE_ROLE_FROM_VIEWER: true, ACTION_MANAGE_ROLE_TO_OWNER: true, ACTION_MANAGE_ROLE_TO_ADMIN: true, ACTION_MANAGE_ROLE_TO_EDITOR: true, ACTION_MANAGE_ROLE_TO_VIEWER: true},
 			UNIT_TYPE_USER:              {ACTION_MANAGE_RENAME_USER: true, ACTION_MANAGE_UPDATE_USER_AVATAR: true},
@@ -276,7 +289,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER:       {},
 			UNIT_TYPE_JOB:               {},
 		},
-		USER_ROLE_ADMIN: {
+		model.USER_ROLE_ADMIN: {
 			UNIT_TYPE_TEAM:              {ACTION_MANAGE_TEAM_NAME: true, ACTION_MANAGE_TEAM_ICON: true, ACTION_MANAGE_UPDATE_TEAM_DOMAIN: true, ACTION_MANAGE_TEAM_CONFIG: true},
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_MANAGE_REMOVE_MEMBER: true, ACTION_MANAGE_ROLE: true, ACTION_MANAGE_ROLE_FROM_ADMIN: true, ACTION_MANAGE_ROLE_FROM_EDITOR: true, ACTION_MANAGE_ROLE_FROM_VIEWER: true, ACTION_MANAGE_ROLE_TO_ADMIN: true, ACTION_MANAGE_ROLE_TO_EDITOR: true, ACTION_MANAGE_ROLE_TO_VIEWER: true},
 			UNIT_TYPE_USER:              {ACTION_MANAGE_RENAME_USER: true, ACTION_MANAGE_UPDATE_USER_AVATAR: true},
@@ -291,7 +304,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER:       {},
 			UNIT_TYPE_JOB:               {},
 		},
-		USER_ROLE_EDITOR: {
+		model.USER_ROLE_EDITOR: {
 			UNIT_TYPE_TEAM_MEMBER:       {ACTION_MANAGE_REMOVE_MEMBER: true, ACTION_MANAGE_ROLE: true, ACTION_MANAGE_ROLE_FROM_EDITOR: true, ACTION_MANAGE_ROLE_FROM_VIEWER: true, ACTION_MANAGE_ROLE_TO_EDITOR: true, ACTION_MANAGE_ROLE_TO_VIEWER: true},
 			UNIT_TYPE_USER:              {ACTION_MANAGE_RENAME_USER: true, ACTION_MANAGE_UPDATE_USER_AVATAR: true},
 			UNIT_TYPE_BUILDER_DASHBOARD: {ACTION_MANAGE_DASHBOARD_BROADCAST: true},
@@ -301,28 +314,28 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 			UNIT_TYPE_TRANSFORMER:       {},
 			UNIT_TYPE_JOB:               {},
 		},
-		USER_ROLE_VIEWER: {
+		model.USER_ROLE_VIEWER: {
 			UNIT_TYPE_TEAM_MEMBER: {ACTION_MANAGE_REMOVE_MEMBER: true, ACTION_MANAGE_ROLE: true, ACTION_MANAGE_ROLE_FROM_VIEWER: true, ACTION_MANAGE_ROLE_TO_VIEWER: true},
 			UNIT_TYPE_USER:        {ACTION_MANAGE_RENAME_USER: true, ACTION_MANAGE_UPDATE_USER_AVATAR: true},
 			UNIT_TYPE_JOB:         {},
 		},
 	},
 	ATTRIBUTE_CATEGORY_SPECIAL: {
-		USER_ROLE_OWNER: {
+		model.USER_ROLE_OWNER: {
 			UNIT_TYPE_TEAM:        {ACTION_SPECIAL_EDITOR_AND_VIEWER_CAN_INVITE_BY_LINK_SW: true},
 			UNIT_TYPE_TEAM_MEMBER: {ACTION_SPECIAL_TRANSFER_OWNER: true},
 			UNIT_TYPE_INVITE:      {ACTION_SPECIAL_INVITE_LINK_RENEW: true},
 			UNIT_TYPE_APP:         {ACTION_SPECIAL_RELEASE_APP: true},
 		},
-		USER_ROLE_ADMIN: {
+		model.USER_ROLE_ADMIN: {
 			UNIT_TYPE_TEAM:   {ACTION_SPECIAL_EDITOR_AND_VIEWER_CAN_INVITE_BY_LINK_SW: true},
 			UNIT_TYPE_INVITE: {ACTION_SPECIAL_INVITE_LINK_RENEW: true},
 			UNIT_TYPE_APP:    {ACTION_SPECIAL_RELEASE_APP: true},
 		},
-		USER_ROLE_EDITOR: {
+		model.USER_ROLE_EDITOR: {
 			UNIT_TYPE_APP: {ACTION_SPECIAL_RELEASE_APP: true},
 		},
-		USER_ROLE_VIEWER: {},
+		model.USER_ROLE_VIEWER: {},
 	},
 }
 
@@ -433,7 +446,7 @@ func (attrg *AttributeGroup) CanModifyRoleFromTo(fromRole, toRole int) bool {
 }
 
 func (attrg *AttributeGroup) DoesNowUserAreEditorOrViewer() bool {
-	if attrg.UserRole == USER_ROLE_EDITOR || attrg.UserRole == USER_ROLE_VIEWER {
+	if attrg.UserRole == model.USER_ROLE_EDITOR || attrg.UserRole == model.USER_ROLE_VIEWER {
 		return true
 	}
 	return false

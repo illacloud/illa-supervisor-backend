@@ -151,11 +151,15 @@ func (controller *Controller) GetTeamMember(c *gin.Context) {
 
 // global role config
 // owner  <MODIFY> owner                 -> any.                   NO, owner must be transferred before modify himself (a team must have an owner).
-// 		  <MODIFY> admin, editor, viewer -> owner.                 YES, it's transfer owner action (when the owner transferred, the old owner became an admin).
-//        <MODIFY> admin, editor, viewer -> admin, editor, viewer. YES.
+//
+//			  <MODIFY> admin, editor, viewer -> owner.                 YES, it's transfer owner action (when the owner transferred, the old owner became an admin).
+//	       <MODIFY> admin, editor, viewer -> admin, editor, viewer. YES.
+//
 // admin  <MODIFY> owner                 -> any.                   NO.
-// 		  <MODIFY> admin, editor, viewer -> owner.                 NO.
-//        <MODIFY> admin, editor, viewer -> admin, editor, viewer. YES.
+//
+//			  <MODIFY> admin, editor, viewer -> owner.                 NO.
+//	       <MODIFY> admin, editor, viewer -> admin, editor, viewer. YES.
+//
 // editor <MODIFY> any                   -> any.                   NO.
 // viewer <MODIFY> any                   -> any.                   NO.
 func (controller *Controller) UpdateTeamMemberRole(c *gin.Context) {
@@ -251,7 +255,7 @@ func (controller *Controller) UpdateTeamMemberRole(c *gin.Context) {
 	// transfer owner action, check if now user is owner and target user is owner himself.
 	if req.IsTransferOwner() {
 		// set owner to admin
-		teamMember.UpdateTeamMemberRole(accesscontrol.USER_ROLE_ADMIN)
+		teamMember.UpdateTeamMemberRole(model.USER_ROLE_ADMIN)
 	}
 
 	// update target teammeber

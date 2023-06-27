@@ -1,7 +1,5 @@
 package model
 
-import "github.com/illacloud/illa-supervisor-backend/src/accesscontrol"
-
 type UpdateTeamMemberRoleRequest struct {
 	UserRole int `json:"userRole" validate:"required"`
 }
@@ -15,7 +13,7 @@ func (u *UpdateTeamMemberRoleRequest) ExportUserRole() int {
 }
 
 func (u *UpdateTeamMemberRoleRequest) IsTransferOwner() bool {
-	if u.UserRole == accesscontrol.USER_ROLE_OWNER {
+	if u.UserRole == USER_ROLE_OWNER {
 		return true
 	}
 	return false

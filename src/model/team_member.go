@@ -5,7 +5,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/illacloud/illa-supervisor-backend/src/accesscontrol"
+)
+
+// User Role ID in Team
+// @note: this will extend as role system later.
+const (
+	USER_ROLE_ANONYMOUS = -1
+	USER_ROLE_OWNER     = 1
+	USER_ROLE_ADMIN     = 2
+	USER_ROLE_EDITOR    = 3
+	USER_ROLE_VIEWER    = 4
 )
 
 const TEAM_MEMBER_STATUS_OK = 1
@@ -156,28 +165,28 @@ func (u *TeamMember) UpdateTeamMemberRole(userRole int) {
 }
 
 func (u *TeamMember) IsOwner() bool {
-	if u.UserRole == accesscontrol.USER_ROLE_OWNER {
+	if u.UserRole == USER_ROLE_OWNER {
 		return true
 	}
 	return false
 }
 
 func (u *TeamMember) IsAdmin() bool {
-	if u.UserRole == accesscontrol.USER_ROLE_ADMIN {
+	if u.UserRole == USER_ROLE_ADMIN {
 		return true
 	}
 	return false
 }
 
 func (u *TeamMember) IsEditor() bool {
-	if u.UserRole == accesscontrol.USER_ROLE_EDITOR {
+	if u.UserRole == USER_ROLE_EDITOR {
 		return true
 	}
 	return false
 }
 
 func (u *TeamMember) IsViewer() bool {
-	if u.UserRole == accesscontrol.USER_ROLE_VIEWER {
+	if u.UserRole == USER_ROLE_VIEWER {
 		return true
 	}
 	return false
@@ -269,7 +278,7 @@ func NewEditorTeamMemberByUserID(userID int) *TeamMember {
 	TeamMember := NewTeamMember()
 	TeamMember.TeamID = TEAM_DEFAULT_ID
 	TeamMember.UserID = userID
-	TeamMember.UserRole = accesscontrol.USER_ROLE_EDITOR
+	TeamMember.UserRole = USER_ROLE_EDITOR
 	TeamMember.Permission = tmp.ExportForTeam()
 	TeamMember.Status = TEAM_MEMBER_STATUS_OK
 	TeamMember.InitCreatedAt()

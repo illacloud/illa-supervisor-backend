@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/illacloud/illa-supervisor-backend/src/accesscontrol"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -96,7 +95,7 @@ func (d *TeamMemberStorage) DoesTeamIncludedTargetUser(teamID int, userID int) (
 func (d *TeamMemberStorage) IsNowUserIsTeamOwner(userID int) (bool, error) {
 	var teamMember *TeamMember
 	var count int64
-	if err := d.db.Model(&teamMember).Where("user_id = ? AND user_role = ?", userID, accesscontrol.USER_ROLE_OWNER).Count(&count).Error; err != nil {
+	if err := d.db.Model(&teamMember).Where("user_id = ? AND user_role = ?", userID, USER_ROLE_OWNER).Count(&count).Error; err != nil {
 		return false, err
 	}
 	if count == 0 {

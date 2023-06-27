@@ -60,7 +60,11 @@ func (controller *Controller) GetTeamPermission(c *gin.Context) {
 
 func (controller *Controller) CanAccess(c *gin.Context) {
 	authorizationToken, errInGetAuthorizationToken := controller.GetStringParamFromHeader(c, PARAM_AUTHORIZATION_TOKEN)
-	userID, _, errInGetUserID := authenticator.ExtractUserIDFromToken(authorizationToken)
+	userID := model.USER_ROLE_ANONYMOUS
+	var errInGetUserID error
+	if authorizationToken != accesscontrol.ANONYMOUS_AUTH_TOKEN {
+		userID, _, errInGetUserID = authenticator.ExtractUserIDFromToken(authorizationToken)
+	}
 	teamID := model.TEAM_DEFAULT_ID
 	unitType, errInGetUnitType := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_TYPE)
 	unitID, errInGetUnitID := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_ID)
@@ -86,14 +90,18 @@ func (controller *Controller) CanAccess(c *gin.Context) {
 	}
 
 	// validate user
-	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
-	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
-		return
+	teamMemberRole := model.USER_ROLE_ANONYMOUS
+	if userID != model.USER_ROLE_ANONYMOUS {
+		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
+		if errInRetrieveTeamMember != nil {
+			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			return
+		}
+		teamMemberRole = teamMember.ExportUserRole()
 	}
 
 	// check attribute
-	attrg := accesscontrol.NewAttributeGroup(teamMember.ExportUserRole(), unitType)
+	attrg := accesscontrol.NewAttributeGroup(teamMemberRole, unitType)
 	attrg.SetUnitID(unitID)
 	if !attrg.CanAccess(attributeID) {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can not access this attribute due to access control policy.")
@@ -108,7 +116,11 @@ func (controller *Controller) CanAccess(c *gin.Context) {
 func (controller *Controller) CanManage(c *gin.Context) {
 	authorizationToken, errInGetAuthorizationToken := controller.GetStringParamFromHeader(c, PARAM_AUTHORIZATION_TOKEN)
 	teamID := model.TEAM_DEFAULT_ID
-	userID, _, errInGetUserID := authenticator.ExtractUserIDFromToken(authorizationToken)
+	userID := model.USER_ROLE_ANONYMOUS
+	var errInGetUserID error
+	if authorizationToken != accesscontrol.ANONYMOUS_AUTH_TOKEN {
+		userID, _, errInGetUserID = authenticator.ExtractUserIDFromToken(authorizationToken)
+	}
 	unitType, errInGetUnitType := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_TYPE)
 	unitID, errInGetUnitID := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_ID)
 	attributeID, errInGetAttributeID := controller.GetMagicIntParamFromRequest(c, PARAM_ATTRIBUTE_ID)
@@ -132,14 +144,18 @@ func (controller *Controller) CanManage(c *gin.Context) {
 	}
 
 	// validate user
-	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
-	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
-		return
+	teamMemberRole := model.USER_ROLE_ANONYMOUS
+	if userID != model.USER_ROLE_ANONYMOUS {
+		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
+		if errInRetrieveTeamMember != nil {
+			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			return
+		}
+		teamMemberRole = teamMember.ExportUserRole()
 	}
 
 	// check attribute
-	attrg := accesscontrol.NewAttributeGroup(teamMember.ExportUserRole(), unitType)
+	attrg := accesscontrol.NewAttributeGroup(teamMemberRole, unitType)
 	attrg.SetUnitID(unitID)
 	if !attrg.CanManage(attributeID) {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can not access this attribute due to access control policy.")
@@ -154,7 +170,11 @@ func (controller *Controller) CanManage(c *gin.Context) {
 func (controller *Controller) CanManageSpecial(c *gin.Context) {
 	authorizationToken, errInGetAuthorizationToken := controller.GetStringParamFromHeader(c, PARAM_AUTHORIZATION_TOKEN)
 	teamID := model.TEAM_DEFAULT_ID
-	userID, _, errInGetUserID := authenticator.ExtractUserIDFromToken(authorizationToken)
+	userID := model.USER_ROLE_ANONYMOUS
+	var errInGetUserID error
+	if authorizationToken != accesscontrol.ANONYMOUS_AUTH_TOKEN {
+		userID, _, errInGetUserID = authenticator.ExtractUserIDFromToken(authorizationToken)
+	}
 	unitType, errInGetUnitType := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_TYPE)
 	unitID, errInGetUnitID := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_ID)
 	attributeID, errInGetAttributeID := controller.GetMagicIntParamFromRequest(c, PARAM_ATTRIBUTE_ID)
@@ -178,14 +198,18 @@ func (controller *Controller) CanManageSpecial(c *gin.Context) {
 	}
 
 	// validate user
-	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
-	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
-		return
+	teamMemberRole := model.USER_ROLE_ANONYMOUS
+	if userID != model.USER_ROLE_ANONYMOUS {
+		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
+		if errInRetrieveTeamMember != nil {
+			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			return
+		}
+		teamMemberRole = teamMember.ExportUserRole()
 	}
 
 	// check attribute
-	attrg := accesscontrol.NewAttributeGroup(teamMember.ExportUserRole(), unitType)
+	attrg := accesscontrol.NewAttributeGroup(teamMemberRole, unitType)
 	attrg.SetUnitID(unitID)
 	if !attrg.CanManageSpecial(attributeID) {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can not access this attribute due to access control policy.")
@@ -200,7 +224,11 @@ func (controller *Controller) CanManageSpecial(c *gin.Context) {
 func (controller *Controller) CanModify(c *gin.Context) {
 	authorizationToken, errInGetAuthorizationToken := controller.GetStringParamFromHeader(c, PARAM_AUTHORIZATION_TOKEN)
 	teamID := model.TEAM_DEFAULT_ID
-	userID, _, errInGetUserID := authenticator.ExtractUserIDFromToken(authorizationToken)
+	userID := model.USER_ROLE_ANONYMOUS
+	var errInGetUserID error
+	if authorizationToken != accesscontrol.ANONYMOUS_AUTH_TOKEN {
+		userID, _, errInGetUserID = authenticator.ExtractUserIDFromToken(authorizationToken)
+	}
 	unitType, errInGetUnitType := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_TYPE)
 	unitID, errInGetUnitID := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_ID)
 	attributeID, errInGetAttributeID := controller.GetMagicIntParamFromRequest(c, PARAM_ATTRIBUTE_ID)
@@ -228,14 +256,18 @@ func (controller *Controller) CanModify(c *gin.Context) {
 	}
 
 	// validate user
-	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
-	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
-		return
+	teamMemberRole := model.USER_ROLE_ANONYMOUS
+	if userID != model.USER_ROLE_ANONYMOUS {
+		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
+		if errInRetrieveTeamMember != nil {
+			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			return
+		}
+		teamMemberRole = teamMember.ExportUserRole()
 	}
 
 	// check attribute
-	attrg := accesscontrol.NewAttributeGroup(teamMember.ExportUserRole(), unitType)
+	attrg := accesscontrol.NewAttributeGroup(teamMemberRole, unitType)
 	attrg.SetUnitID(unitID)
 	if !attrg.CanModify(attributeID, fromID, toID) {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can not access this attribute due to access control policy.")
@@ -250,7 +282,11 @@ func (controller *Controller) CanModify(c *gin.Context) {
 func (controller *Controller) CanDelete(c *gin.Context) {
 	authorizationToken, errInGetAuthorizationToken := controller.GetStringParamFromHeader(c, PARAM_AUTHORIZATION_TOKEN)
 	teamID := model.TEAM_DEFAULT_ID
-	userID, _, errInGetUserID := authenticator.ExtractUserIDFromToken(authorizationToken)
+	userID := model.USER_ROLE_ANONYMOUS
+	var errInGetUserID error
+	if authorizationToken != accesscontrol.ANONYMOUS_AUTH_TOKEN {
+		userID, _, errInGetUserID = authenticator.ExtractUserIDFromToken(authorizationToken)
+	}
 	unitType, errInGetUnitType := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_TYPE)
 	unitID, errInGetUnitID := controller.GetMagicIntParamFromRequest(c, PARAM_UNIT_ID)
 	attributeID, errInGetAttributeID := controller.GetMagicIntParamFromRequest(c, PARAM_ATTRIBUTE_ID)
@@ -274,14 +310,18 @@ func (controller *Controller) CanDelete(c *gin.Context) {
 	}
 
 	// validate user
-	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
-	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
-		return
+	teamMemberRole := model.USER_ROLE_ANONYMOUS
+	if userID != model.USER_ROLE_ANONYMOUS {
+		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
+		if errInRetrieveTeamMember != nil {
+			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			return
+		}
+		teamMemberRole = teamMember.ExportUserRole()
 	}
 
 	// check attribute
-	attrg := accesscontrol.NewAttributeGroup(teamMember.ExportUserRole(), unitType)
+	attrg := accesscontrol.NewAttributeGroup(teamMemberRole, unitType)
 	attrg.SetUnitID(unitID)
 	if !attrg.CanDelete(attributeID) {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can not access this attribute due to access control policy.")
