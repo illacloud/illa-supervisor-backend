@@ -40,6 +40,7 @@ const (
 	UNIT_TYPE_TRANSACTION_SERIALS       = 23 // transaction serials
 	UNIT_TYPE_CAPACITIES                = 24 // capacity
 	UNIT_TYPE_DRIVE                     = 25 // drive
+	UNIT_TYPE_PERIPHERAL_SERVICE        = 26 // Peripheral service, including sql generate, STMP etc.
 )
 
 // global invite permission config
@@ -136,6 +137,11 @@ const (
 	ACTION_MANAGE_EDIT_ACTION    // edit action
 	ACTION_MANAGE_PREVIEW_ACTION // preview action
 	ACTION_MANAGE_RUN_ACTION     // run action
+
+	// Drive Attribute
+	ACTION_MANAGE_CREATE_FILE      // create file
+	ACTION_MANAGE_EDIT_FILE        // edit file
+	ACTION_MANAGE_CREATE_SHARELINK // create sharelink
 )
 
 // action delete
@@ -159,7 +165,8 @@ const (
 	ACTION_SPECIAL_INVITE_LINK_RENEW // renew the invite link
 	// APP Attribute
 	ACTION_SPECIAL_RELEASE_APP // release APP
-
+	// SQL Generate
+	ACTION_SPECIAL_GENERATE_SQL // generate sql
 )
 
 // Attribute Config List
