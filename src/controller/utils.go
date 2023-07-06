@@ -27,6 +27,7 @@ const PARAM_TO_ID = "toID"
 const PARAM_VERSION = "version"
 const PARAM_TARGET_TEAM_MEMBER_ID = "targetTeamMemberID"
 const PARAM_FILE_NAME = "fileName"
+const PARAM_TARGET_USER_IDS = "targetUserIDs"
 
 const (
 	// validate failed

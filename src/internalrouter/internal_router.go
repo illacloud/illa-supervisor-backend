@@ -35,5 +35,6 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 
 	// data control routers
 	dataControlRouter.GET("/users/:targetUserID", r.Controller.GetTargetUserByInternalRequest)
+	dataControlRouter.GET("/users/multi/:targetUserIDs", r.Controller.GetTargetUsersByInternalRequest)
 	dataControlRouter.GET("/teams/byIdentifier/:teamIdentifier", r.Controller.GetTargetTeamByIdentifier)
 }

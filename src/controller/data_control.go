@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/illacloud/illa-supervisor-backend/src/model"
 )
@@ -27,6 +30,38 @@ func (controller *Controller) GetTargetUserByInternalRequest(c *gin.Context) {
 
 	// feedback
 	controller.FeedbackOK(c, model.NewGetTargetUserByInternalRequestResponse(user))
+	return
+}
+
+func (controller *Controller) GetTargetUsersByInternalRequest(c *gin.Context) {
+	targetUserIDsString, errInGetTargetUserIDsString := controller.GetStringParamFromRequest(c, PARAM_TARGET_USER_IDS)
+	if errInGetTargetUserIDsString != nil {
+		return
+	}
+
+	// validate request data
+	validated, errInValidate := controller.ValidateRequestTokenFromHeader(c, targetUserIDsString)
+	if !validated && errInValidate != nil {
+		return
+	}
+
+	// convert ids from string to int
+	targetUserIDsStringSlice := strings.Split(targetUserIDsString, ",")
+	var targetUserIDsInInt []int
+	for _, idInString := range targetUserIDsStringSlice {
+		idInInt, _ := strconv.Atoi(idInString)
+		targetUserIDsInInt = append(targetUserIDsInInt, idInInt)
+	}
+
+	// fetch target user info
+	users, err := controller.Storage.UserStorage.RetrieveByIDs(targetUserIDsInInt)
+	if err != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		return
+	}
+
+	// feedback
+	controller.FeedbackOK(c, model.NewGetTargetUsersByInternalRequestResponse(users))
 	return
 }
 
