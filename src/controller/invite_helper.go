@@ -27,10 +27,10 @@ func (controller *Controller) DoesTeamInvitePermissionWasClosed(c *gin.Context, 
 	return false
 }
 
-func (controller *Controller) SendInvite(c *gin.Context, invite *model.Invite, team *model.Team, user *model.User) error {
+func (controller *Controller) SendInvite(c *gin.Context, invite *model.Invite, team *model.Team, user *model.User, redirectPage string) error {
 	// email share app invite
 	if invite.IsShareAppInvite() {
-		m := model.NewEmailShareAppMessage(invite, team, user)
+		m := model.NewEmailShareAppMessage(invite, team, user, redirectPage)
 		token := controller.RequestTokenValidator.GenerateValidateToken(m.UserName, m.TeamName, m.TeamIcon, m.Email, m.AppLink, m.Language)
 		m.SetValidateToken(token)
 		errInSendEmail := model.SendShareAppEmail(m)
@@ -114,7 +114,7 @@ func (controller *Controller) FeedbackInviteByEmail(c *gin.Context, invite *mode
 	controller.FeedbackOK(c, resp)
 }
 
-func (controller *Controller) FeedbackInviteByLink(c *gin.Context, invite *model.Invite) {
-	resp := model.NewGenerateInviteLinkResponseByInvite(invite)
+func (controller *Controller) FeedbackInviteByLink(c *gin.Context, invite *model.Invite, redirectPage string) {
+	resp := model.NewGenerateInviteLinkResponseByInvite(invite, redirectPage)
 	controller.FeedbackOK(c, resp)
 }

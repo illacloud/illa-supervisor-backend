@@ -131,7 +131,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 
 		// - exists, resend, end
 		if existsInvite.ExportUserRole() == req.ExportUserRole() {
-			if controller.SendInvite(c, existsInvite, team, user) != nil {
+			if controller.SendInvite(c, existsInvite, team, user, req.ExportRedirectPage()) != nil {
 				return
 			}
 			controller.FeedbackInviteByEmail(c, existsInvite)
@@ -152,7 +152,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 			if controller.UpdateTeamMember(c, existsTeamMember) != nil {
 				return
 			}
-			if controller.SendInvite(c, existsInvite, team, user) != nil {
+			if controller.SendInvite(c, existsInvite, team, user, req.ExportRedirectPage()) != nil {
 				return
 			}
 			controller.FeedbackInviteByEmail(c, existsInvite)
@@ -184,7 +184,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 	}
 
 	// - send invite email
-	if controller.SendInvite(c, newInviteEmailLink, team, user) != nil {
+	if controller.SendInvite(c, newInviteEmailLink, team, user, req.ExportRedirectPage()) != nil {
 		return
 	}
 
@@ -202,25 +202,27 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 
 // Execute Phrase:
 // - init phrase
-//     - get teamID
-//     - get userID
-//     - get userRole
-//     - fetch teamMember record
-//     - check attribute
-//     - fetch team record
-//     - check team permission
+//   - get teamID
+//   - get userID
+//   - get userRole
+//   - fetch teamMember record
+//   - check attribute
+//   - fetch team record
+//   - check team permission
+//
 // - execute invite phrase
-//     - fetch invite record
-//     - if invite already exists
-//         - true, feedback
-//     - generate new invite
-//     - create invite record
-//     - feedback
+//   - fetch invite record
+//   - if invite already exists
+//   - true, feedback
+//   - generate new invite
+//   - create invite record
+//   - feedback
 func (controller *Controller) GenerateInviteLink(c *gin.Context) {
 	// get team id & user id
 	teamID := model.TEAM_DEFAULT_ID
 	userID, errInGetUserID := controller.GetUserIDFromAuth(c)
 	userRole, errInGetUserRole := controller.GetIntParamFromRequest(c, PARAM_USER_ROLE)
+	redirectPage, _ := controller.TestStringParamFromRequest(c, PARAM_REDIRECT_PAGE)
 	if errInGetUserID != nil || errInGetUserRole != nil {
 		return
 	}
@@ -279,7 +281,7 @@ func (controller *Controller) GenerateInviteLink(c *gin.Context) {
 			invite.SetAppID(appID)
 			invite.SetTeamIdentifier(team.GetIdentifier())
 		}
-		controller.FeedbackInviteByLink(c, invite)
+		controller.FeedbackInviteByLink(c, invite, redirectPage)
 		return
 	}
 
@@ -296,7 +298,7 @@ func (controller *Controller) GenerateInviteLink(c *gin.Context) {
 	}
 
 	// return invite link
-	controller.FeedbackInviteByLink(c, newInviteLink)
+	controller.FeedbackInviteByLink(c, newInviteLink, redirectPage)
 	return
 }
 
@@ -321,6 +323,7 @@ func (controller *Controller) RenewInviteLink(c *gin.Context) {
 	teamID := model.TEAM_DEFAULT_ID
 	userID, errInGetUserID := controller.GetUserIDFromAuth(c)
 	userRole, errInGetUserRole := controller.GetIntParamFromRequest(c, PARAM_USER_ROLE)
+	redirectPage, _ := controller.TestStringParamFromRequest(c, PARAM_REDIRECT_PAGE)
 	if errInGetUserID != nil || errInGetUserRole != nil {
 		return
 	}
@@ -395,7 +398,7 @@ func (controller *Controller) RenewInviteLink(c *gin.Context) {
 	}
 
 	// return invite link
-	controller.FeedbackInviteByLink(c, newInviteLink)
+	controller.FeedbackInviteByLink(c, newInviteLink, redirectPage)
 	return
 }
 

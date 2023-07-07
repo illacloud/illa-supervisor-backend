@@ -71,7 +71,9 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 
 	// share routers
 	teamsRouter.GET("/:teamID/shareAppLink/userRole/:userRole/apps/:appID", r.Controller.GenerateInviteLink)
+	teamsRouter.GET("/:teamID/shareAppLink/userRole/:userRole/apps/:appID/redirectPage/:redirectPage", r.Controller.GenerateInviteLink)
 	teamsRouter.GET("/:teamID/newShareAppLink/userRole/:userRole/apps/:appID", r.Controller.RenewInviteLink)
+	teamsRouter.GET("/:teamID/newShareAppLink/userRole/:userRole/apps/:appID/redirectPage/:redirectPage", r.Controller.RenewInviteLink)
 	teamsRouter.POST("/:teamID/shareAppByEmail", r.Controller.InviteMemberByEmail)
 
 	// status router

@@ -23,6 +23,9 @@ const INVITE_URI_TEMPLATE = "?inviteToken=%s"
 const INVITE_EMAIL_TEMPLATE = "&teamIdentifier=%s&email=%s"
 const INVITE_SHARE_APP_TEMPLATE = "&teamIdentifier=%s&appID=%s"
 const INVITE_EMAIL_AND_SHARE_APP_TEMPLATE = "&teamIdentifier=%s&email=%s&appID=%s"
+const SHARE_LINK_RECIRECT_PAGE_URI_PARAM = "&redirectPage="
+const SHARE_LINK_REDIRECT_PAGE_EDIT = "edit"
+const SHARE_LINK_REDIRECT_PAGE_RELEASE = "release"
 
 type Invite struct {
 	ID             int       `json:"id" gorm:"column:id;type:bigserial;primary_key;index:invite_ukey"`
@@ -325,13 +328,21 @@ type EmailShareAppMessage struct {
 	ValidateToken string `json:"validateToken"` // token for query authorize, base64.Encoding(md5(...param + ROTOR_TOKEN))
 }
 
-func NewEmailShareAppMessage(invite *Invite, team *Team, user *User) *EmailShareAppMessage {
+func GenerateRedirectPageParam(redirectPage string) string {
+	redirectPageParam := ""
+	if len(redirectPage) != 0 {
+		redirectPageParam += SHARE_LINK_RECIRECT_PAGE_URI_PARAM + redirectPage
+	}
+	return redirectPageParam
+}
+
+func NewEmailShareAppMessage(invite *Invite, team *Team, user *User, redirectPage string) *EmailShareAppMessage {
 	return &EmailShareAppMessage{
 		UserName: user.Nickname,
 		TeamName: team.Name,
 		TeamIcon: team.Icon,
 		Email:    invite.Email,
-		AppLink:  invite.ExportShareAppLinkWithEmailANDTeamIdentifier(team),
+		AppLink:  invite.ExportShareAppLinkWithEmailANDTeamIdentifier(team) + GenerateRedirectPageParam(redirectPage),
 		Language: user.ExportLanguage(),
 	}
 }

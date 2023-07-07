@@ -31,7 +31,7 @@ func (u *GenerateInviteLinkResponse) SetInviteLink(inviteLink string) {
 	u.InviteLink = inviteLink
 }
 
-func NewGenerateInviteLinkResponseByInvite(invite *Invite) *GenerateInviteLinkResponse {
+func NewGenerateInviteLinkResponseByInvite(invite *Invite, redirectPage string) *GenerateInviteLinkResponse {
 	i := NewGenerateInviteLinkResponse()
 	i.TeamID = idconvertor.ConvertIntToString(invite.TeamID)
 	i.AppID = idconvertor.ConvertIntToString(invite.AppID)
@@ -41,6 +41,8 @@ func NewGenerateInviteLinkResponseByInvite(invite *Invite) *GenerateInviteLinkRe
 	} else {
 		i.InviteLink = invite.ExportInviteLink()
 	}
+	// add redirectPage suffix to link
+	i.InviteLink += GenerateRedirectPageParam(redirectPage)
 	return i
 }
 
