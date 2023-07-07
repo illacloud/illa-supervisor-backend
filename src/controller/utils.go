@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -140,12 +141,31 @@ func (controller *Controller) ValidateRequestTokenFromHeader(c *gin.Context, inp
 	// validate
 	tokenShouldBe := controller.RequestTokenValidator.GenerateValidateTokenBySliceParam(input)
 	if token != tokenShouldBe {
+		log.Println("Illegal internal request token detected: \"" + token + "\", the token should be: \"" + tokenShouldBe + "\"")
 		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "request token mismatch.")
 		return false, errors.New("request token mismatch.")
 	}
 	return true, nil
 }
 
+func (controller *Controller) ValidateRequestTokenFromHeaderByStringMap(c *gin.Context, input []string) (bool, error) {
+	// fetch token
+	rawToken := c.Request.Header[PARAM_REQUEST_TOKEN]
+	if len(rawToken) != 1 {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "HTTP request header missing request token.")
+		return false, errors.New("missing request token.")
+	}
+	var token string
+	token = rawToken[0]
+	// validate
+	tokenShouldBe := controller.RequestTokenValidator.GenerateValidateTokenBySliceParam(input)
+	if token != tokenShouldBe {
+		log.Println("Illegal internal request token detected: \"" + token + "\", the token should be: \"" + tokenShouldBe + "\"")
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "request token mismatch.")
+		return false, errors.New("request token mismatch.")
+	}
+	return true, nil
+}
 func (controller *Controller) GetMagicIntParamFromRequest(c *gin.Context, paramName string) (int, error) {
 	// get request param
 	paramValue := c.Param(paramName)
@@ -189,6 +209,15 @@ func (controller *Controller) GetStringParamFromRequest(c *gin.Context, paramNam
 	if len(paramValue) == 0 {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "please input param for request.")
 		return "", errors.New("input mission " + paramName + " field.")
+	}
+	return paramValue, nil
+}
+
+func (controller *Controller) TestStringParamFromRequest(c *gin.Context, paramName string) (string, error) {
+	// get request param
+	paramValue := c.Param(paramName)
+	if len(paramValue) == 0 {
+		return "", errors.New("input missing " + paramName + " field.")
 	}
 	return paramValue, nil
 }
