@@ -324,6 +324,7 @@ var AttributeConfigList = map[int]map[int]map[int]map[int]bool{
 		model.USER_ROLE_VIEWER: {
 			UNIT_TYPE_TEAM_MEMBER: {ACTION_MANAGE_REMOVE_MEMBER: true, ACTION_MANAGE_ROLE: true, ACTION_MANAGE_ROLE_FROM_VIEWER: true, ACTION_MANAGE_ROLE_TO_VIEWER: true},
 			UNIT_TYPE_USER:        {ACTION_MANAGE_RENAME_USER: true, ACTION_MANAGE_UPDATE_USER_AVATAR: true},
+			UNIT_TYPE_ACTION:      {ACTION_MANAGE_RUN_ACTION: true},
 			UNIT_TYPE_JOB:         {},
 		},
 	},
