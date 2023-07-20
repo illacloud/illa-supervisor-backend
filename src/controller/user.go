@@ -65,6 +65,18 @@ func (controller *Controller) SignUp(c *gin.Context) {
 		return
 	}
 
+	// check if team setting `blockRegister` is true
+	team, errInGetTeam := controller.Storage.TeamStorage.RetrieveByID(DEFAULT_TEAM_ID)
+	if errInGetTeam != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team failed: "+errInGetTeam.Error())
+		return
+	}
+	teamPermission := team.ExportTeamPermission()
+	if teamPermission.DoesBlockRegister() {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_REGISTER_BLOCKED, "signup failed: registration blocked")
+		return
+	}
+
 	// check if email laready used
 	_, errFetchUserRecord := controller.Storage.UserStorage.RetrieveByEmail(req.ExportEmail())
 	if errFetchUserRecord == nil {
