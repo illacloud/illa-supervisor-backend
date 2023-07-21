@@ -19,6 +19,7 @@ const TEAM_P_FIELD_ALLOW_VIEWER_INVITE = "allowViewerInvite"
 const TEAM_P_FIELD_ALLOW_EDITOR_MANAGE_TEAM_MEMBER = "allowEditorManageTeamMember"
 const TEAM_P_FIELD_ALLOW_VIEWER_MANAGE_TEAM_MEMBER = "allowViewerManageTeamMember"
 const TEAM_P_FIELD_INVITE_LINK_ENABLED = "inviteLinkEnabled"
+const TEAM_P_FIELD_BLOCK_REGISTER = "blockRegister"
 
 type Team struct {
 	ID         int       `json:"id" gorm:"column:id;type:bigserial;primary_key;index:teams_ukey"`
@@ -155,6 +156,11 @@ func (u *Team) UpdateByUpdateTeamPermissionRawRequest(rawReq map[string]interfac
 			if !assertPass {
 				return errors.New("update team permission failed due to assert failed.")
 			}
+		case TEAM_P_FIELD_BLOCK_REGISTER:
+			tp.BlockRegister, assertPass = value.(bool)
+			if !assertPass {
+				return errors.New("update team permission failed due to assert failed.")
+			}
 		default:
 		}
 	}
@@ -199,6 +205,7 @@ type TeamPermission struct {
 	AllowEditorManageTeamMember bool `json:"allowEditorManageTeamMember"`
 	AllowViewerManageTeamMember bool `json:"allowViewerManageTeamMember"`
 	InviteLinkEnabled           bool `json:"inviteLinkEnabled"`
+	BlockRegister               bool `json:"blockRegister"`
 }
 
 func NewTeamPermission() *TeamPermission {
@@ -208,6 +215,7 @@ func NewTeamPermission() *TeamPermission {
 		AllowEditorManageTeamMember: true,
 		AllowViewerManageTeamMember: true,
 		InviteLinkEnabled:           true,
+		BlockRegister:               false,
 	}
 }
 
@@ -223,6 +231,7 @@ func (tp *TeamPermission) ImportFromTeam(team *Team) {
 	tp.AllowEditorManageTeamMember = ttp.AllowEditorManageTeamMember
 	tp.AllowViewerManageTeamMember = ttp.AllowViewerManageTeamMember
 	tp.InviteLinkEnabled = ttp.InviteLinkEnabled
+	tp.BlockRegister = ttp.BlockRegister
 }
 
 func (tp *TeamPermission) EnableInviteLink() {
@@ -243,4 +252,8 @@ func (tp *TeamPermission) DoesEditorCanManageTeamMember() bool {
 
 func (tp *TeamPermission) DoesViewerCanManageTeamMember() bool {
 	return tp.AllowViewerManageTeamMember
+}
+
+func (tp *TeamPermission) DoesBlockRegister() bool {
+	return tp.BlockRegister
 }
