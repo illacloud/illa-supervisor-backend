@@ -131,7 +131,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 
 		// - exists, resend, end
 		if existsInvite.ExportUserRole() == req.ExportUserRole() {
-			if controller.SendInvite(c, existsInvite, team, user, req.ExportRedirectPage()) != nil {
+			if controller.SendInvite(c, existsInvite, team, user, req.ExportRedirectURL()) != nil {
 				return
 			}
 			controller.FeedbackInviteByEmail(c, existsInvite)
@@ -152,7 +152,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 			if controller.UpdateTeamMember(c, existsTeamMember) != nil {
 				return
 			}
-			if controller.SendInvite(c, existsInvite, team, user, req.ExportRedirectPage()) != nil {
+			if controller.SendInvite(c, existsInvite, team, user, req.ExportRedirectURL()) != nil {
 				return
 			}
 			controller.FeedbackInviteByEmail(c, existsInvite)
@@ -184,7 +184,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 	}
 
 	// - send invite email
-	if controller.SendInvite(c, newInviteEmailLink, team, user, req.ExportRedirectPage()) != nil {
+	if controller.SendInvite(c, newInviteEmailLink, team, user, req.ExportRedirectURL()) != nil {
 		return
 	}
 
@@ -222,7 +222,7 @@ func (controller *Controller) GenerateInviteLink(c *gin.Context) {
 	teamID := model.TEAM_DEFAULT_ID
 	userID, errInGetUserID := controller.GetUserIDFromAuth(c)
 	userRole, errInGetUserRole := controller.GetIntParamFromRequest(c, PARAM_USER_ROLE)
-	redirectPage, _ := controller.TestStringParamFromRequest(c, PARAM_REDIRECT_PAGE)
+	redirectURL, _ := controller.TestFirstStringParamValueFromURI(c, PARAM_REDIRECT_URL)
 	if errInGetUserID != nil || errInGetUserRole != nil {
 		return
 	}
@@ -281,7 +281,7 @@ func (controller *Controller) GenerateInviteLink(c *gin.Context) {
 			invite.SetAppID(appID)
 			invite.SetTeamIdentifier(team.GetIdentifier())
 		}
-		controller.FeedbackInviteByLink(c, invite, redirectPage)
+		controller.FeedbackInviteByLink(c, invite, redirectURL)
 		return
 	}
 
@@ -298,7 +298,7 @@ func (controller *Controller) GenerateInviteLink(c *gin.Context) {
 	}
 
 	// return invite link
-	controller.FeedbackInviteByLink(c, newInviteLink, redirectPage)
+	controller.FeedbackInviteByLink(c, newInviteLink, redirectURL)
 	return
 }
 
@@ -323,7 +323,7 @@ func (controller *Controller) RenewInviteLink(c *gin.Context) {
 	teamID := model.TEAM_DEFAULT_ID
 	userID, errInGetUserID := controller.GetUserIDFromAuth(c)
 	userRole, errInGetUserRole := controller.GetIntParamFromRequest(c, PARAM_USER_ROLE)
-	redirectPage, _ := controller.TestStringParamFromRequest(c, PARAM_REDIRECT_PAGE)
+	redirectURL, _ := controller.TestFirstStringParamValueFromURI(c, PARAM_REDIRECT_URL)
 	if errInGetUserID != nil || errInGetUserRole != nil {
 		return
 	}
@@ -398,7 +398,7 @@ func (controller *Controller) RenewInviteLink(c *gin.Context) {
 	}
 
 	// return invite link
-	controller.FeedbackInviteByLink(c, newInviteLink, redirectPage)
+	controller.FeedbackInviteByLink(c, newInviteLink, redirectURL)
 	return
 }
 

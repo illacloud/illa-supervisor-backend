@@ -23,7 +23,7 @@ const INVITE_URI_TEMPLATE = "?inviteToken=%s"
 const INVITE_EMAIL_TEMPLATE = "&teamIdentifier=%s&email=%s"
 const INVITE_SHARE_APP_TEMPLATE = "&teamIdentifier=%s&appID=%s"
 const INVITE_EMAIL_AND_SHARE_APP_TEMPLATE = "&teamIdentifier=%s&email=%s&appID=%s"
-const SHARE_LINK_RECIRECT_PAGE_URI_PARAM = "&redirectPage="
+const SHARE_LINK_RECIRECT_PAGE_URI_PARAM = "&redirectURL="
 const SHARE_LINK_REDIRECT_PAGE_EDIT = "edit"
 const SHARE_LINK_REDIRECT_PAGE_RELEASE = "release"
 

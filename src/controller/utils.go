@@ -29,7 +29,7 @@ const PARAM_VERSION = "version"
 const PARAM_TARGET_TEAM_MEMBER_ID = "targetTeamMemberID"
 const PARAM_FILE_NAME = "fileName"
 const PARAM_TARGET_USER_IDS = "targetUserIDs"
-const PARAM_REDIRECT_PAGE = "redirectPage"
+const PARAM_REDIRECT_URL = "redirectURL"
 
 const DEFAULT_TEAM_ID = 0
 
@@ -224,6 +224,38 @@ func (controller *Controller) TestStringParamFromRequest(c *gin.Context, paramNa
 		return "", errors.New("input missing " + paramName + " field.")
 	}
 	return paramValue, nil
+}
+
+func (controller *Controller) GetFirstStringParamValueFromURI(c *gin.Context, paramName string) (string, error) {
+	valueMaps := c.Request.URL.Query()
+	paramValues, hit := valueMaps[paramName]
+	// get request param
+	if !hit {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "please input param for request.")
+		return "", errors.New("input missing " + paramName + " field.")
+	}
+	return paramValues[0], nil
+}
+
+func (controller *Controller) TestFirstStringParamValueFromURI(c *gin.Context, paramName string) (string, error) {
+	valueMaps := c.Request.URL.Query()
+	paramValues, hit := valueMaps[paramName]
+	// get request param
+	if !hit {
+		return "", errors.New("input missing " + paramName + " field.")
+	}
+	return paramValues[0], nil
+}
+
+func (controller *Controller) GetStringParamValuesFromURI(c *gin.Context, paramName string) ([]string, error) {
+	valueMaps := c.Request.URL.Query()
+	paramValues, hit := valueMaps[paramName]
+	// get request param
+	if !hit {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "please input param for request.")
+		return nil, errors.New("input missing " + paramName + " field.")
+	}
+	return paramValues, nil
 }
 
 func (controller *Controller) GetStringParamFromHeader(c *gin.Context, paramName string) (string, error) {

@@ -5,12 +5,12 @@ import (
 )
 
 type InviteMemberByEmailRequest struct {
-	UserRole     int    `json:"userRole" validate:"required"`
-	Email        string `json:"email" validate:"required,email"`
-	AppIDRaw     string `json:"appID"`        // optional
-	Hosts        string `json:"hosts"`        // optional
-	AppID        int    `json:"-"`            // optional
-	RedirectPage string `json:"redirectPage"` // optional
+	UserRole    int    `json:"userRole" validate:"required"`
+	Email       string `json:"email" validate:"required,email"`
+	AppIDRaw    string `json:"appID"`       // optional
+	Hosts       string `json:"hosts"`       // optional
+	AppID       int    `json:"-"`           // optional
+	RedirectURL string `json:"redirectURL"` // optional
 
 }
 
@@ -33,8 +33,8 @@ func (u *InviteMemberByEmailRequest) ExportAppID() int {
 	return u.AppID
 }
 
-func (u *InviteMemberByEmailRequest) ExportRedirectPage() string {
-	return u.RedirectPage
+func (u *InviteMemberByEmailRequest) ExportRedirectURL() string {
+	return u.RedirectURL
 }
 
 func (u *InviteMemberByEmailRequest) ExportHosts() string {
