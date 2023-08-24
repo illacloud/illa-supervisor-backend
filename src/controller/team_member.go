@@ -150,18 +150,15 @@ func (controller *Controller) GetTeamMember(c *gin.Context) {
 }
 
 // global role config
-// owner  <MODIFY> owner                 -> any.                   NO, owner must be transferred before modify himself (a team must have an owner).
 //
-//			  <MODIFY> admin, editor, viewer -> owner.                 YES, it's transfer owner action (when the owner transferred, the old owner became an admin).
-//	       <MODIFY> admin, editor, viewer -> admin, editor, viewer. YES.
-//
-// admin  <MODIFY> owner                 -> any.                   NO.
-//
-//			  <MODIFY> admin, editor, viewer -> owner.                 NO.
-//	       <MODIFY> admin, editor, viewer -> admin, editor, viewer. YES.
-//
-// editor <MODIFY> any                   -> any.                   NO.
-// viewer <MODIFY> any                   -> any.                   NO.
+// owner  [MODIFY] owner                 [to] any.                   NO, owner must be transferred before modify himself (a team must have an owner)
+// -      [MODIFY] admin, editor, viewer [to] owner.                 YES, it's transfer owner action (when the owner transferred, the old owner became an admin).
+// -      [MODIFY] admin, editor, viewer [to] admin, editor, viewer. YES.
+// admin  [MODIFY] owner                 [to] any.                   NO.
+// -      [MODIFY] admin, editor, viewer [to] owner.                 NO.
+// -      [MODIFY] admin, editor, viewer [to] admin, editor, viewer. YES.
+// editor [MODIFY] any                   [to] any.                   NO.
+// viewer [MODIFY] any                   [to] any.                   NO.
 func (controller *Controller) UpdateTeamMemberRole(c *gin.Context) {
 	// get team id & user id
 	teamID := model.TEAM_DEFAULT_ID
@@ -287,15 +284,14 @@ func (controller *Controller) UpdateTeamMemberRole(c *gin.Context) {
 }
 
 // remove team member config
-// owner  <DELETE> owner                 NO, owner can not delete himself (a team must have an owner).
-// 		  <DELETE> admin, editor, viewer YES.
-// admin  <DELETE> owner                 NO.
-// 		  <DELETE> admin, editor, viewer YES.
-// editor <DELETE> any                   NO.
-// 		  <DELETE> editor, viewer        YES.
-// viewer <DELETE> any                   NO.
-// 		  <DELETE> viewer 				 YES.
-
+// owner  [DELETE] owner                  NO, owner can not delete himself (team must have an owner).
+// -      [DELETE] admin, editor, viewer  YES.
+// admin  [DELETE] owner                  NO.
+// -      [DELETE] admin, editor, viewer  YES.
+// editor [DELETE] any                    NO.
+// -      [DELETE] editor, viewer         YES.
+// viewer [DELETE] any                    NO.
+// -      [DELETE] viewer 				  YES.
 func (controller *Controller) RemoveTeamMember(c *gin.Context) {
 	// get team id & user id
 	teamID := model.TEAM_DEFAULT_ID
