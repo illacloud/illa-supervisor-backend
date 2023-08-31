@@ -12,8 +12,8 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 
-	"github.com/illacloud/builder-backend/src/utils/config"
 	"github.com/illacloud/illa-supervisor-backend/src/model"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
 )
 
 type AuthClaims struct {
