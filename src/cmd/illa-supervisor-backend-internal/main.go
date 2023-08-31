@@ -63,7 +63,7 @@ func initDrive(globalConfig *config.Config, logger *zap.SugaredLogger) *model.Dr
 
 func initServer() (*Server, error) {
 	// set trial key for self-host users
-	os.Setenv("ILLA_SECRET_KEY", "8xEMrWkBARcDDYQ")
+	os.Setenv("ILLA_SECRET_KEY", "")
 	// init
 	globalConfig, err := config.GetConfig()
 	if err != nil {
