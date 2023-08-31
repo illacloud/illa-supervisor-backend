@@ -62,21 +62,14 @@ func initDrive(globalConfig *config.Config, logger *zap.SugaredLogger) *model.Dr
 }
 
 func initServer() (*Server, error) {
-	// set trial key for self-host users
-	os.Setenv("ILLA_SECRET_KEY", "")
 	// init
-	globalConfig, err := config.GetConfig()
-	if err != nil {
-		return nil, err
-	}
+	globalConfig := config.GetInstance()
 	engine := gin.New()
 	sugaredLogger := logger.NewSugardLogger()
 
 	// init validator
-	validator, err := tokenvalidator.NewRequestTokenValidator()
-	if err != nil {
-		return nil, err
-	}
+	validator := tokenvalidator.NewRequestTokenValidator()
+
 	// init driver
 	storage := initStorage(globalConfig, sugaredLogger)
 	cache := initCache(globalConfig, sugaredLogger)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 
+	"github.com/illacloud/builder-backend/src/utils/config"
 	"github.com/illacloud/illa-supervisor-backend/src/model"
 )
 
@@ -47,7 +47,8 @@ func (a *Authenticator) ValidateAccessToken(accessToken string) (bool, error) {
 func ExtractUserIDFromToken(accessToken string) (int, uuid.UUID, error) {
 	authClaims := &AuthClaims{}
 	token, err := jwt.ParseWithClaims(accessToken, authClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("ILLA_SECRET_KEY")), nil
+		conf := config.GetInstance()
+		return []byte(conf.GetSecretKey()), nil
 	})
 	if err != nil {
 		return 0, uuid.Nil, err
@@ -64,7 +65,8 @@ func ExtractUserIDFromToken(accessToken string) (int, uuid.UUID, error) {
 func ExtractExpiresAtFromToken(accessToken string) (*jwt.NumericDate, error) {
 	authClaims := &AuthClaims{}
 	token, err := jwt.ParseWithClaims(accessToken, authClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("ILLA_SECRET_KEY")), nil
+		conf := config.GetInstance()
+		return []byte(conf.GetSecretKey()), nil
 	})
 	if err != nil {
 		return nil, err
@@ -108,7 +110,8 @@ func CreateAccessToken(id int, uid uuid.UUID) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	accessToken, err := token.SignedString([]byte(os.Getenv("ILLA_SECRET_KEY")))
+	conf := config.GetInstance()
+	accessToken, err := token.SignedString([]byte(conf.GetSecretKey()))
 	if err != nil {
 		return "", err
 	}

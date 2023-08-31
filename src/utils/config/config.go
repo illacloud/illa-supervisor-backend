@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/caarlos0/env"
@@ -12,6 +13,22 @@ const DEPLOY_MODE_CLOUD = "cloud"
 const DRIVE_TYPE_AWS = "aws"
 const DRIVE_TYPE_MINIO = "minio"
 
+var instance *Config
+var once sync.Once
+
+func GetInstance() *Config {
+	once.Do(func() {
+		var err error
+		if instance == nil {
+			instance, err = getConfig() // not thread safe
+			if err != nil {
+				panic(err)
+			}
+		}
+	})
+	return instance
+}
+
 type Config struct {
 	// server config
 	ServerHost         string `env:"ILLA_SERVER_HOST"              envDefault:"0.0.0.0"`
@@ -19,6 +36,7 @@ type Config struct {
 	InternalServerPort string `env:"ILLA_SERVER_INTERNAL_PORT"     envDefault:"9001"`
 	ServerMode         string `env:"ILLA_SERVER_MODE"              envDefault:"debug"`
 	DeployMode         string `env:"ILLA_DEPLOY_MODE"              envDefault:"self-host"`
+	SecretKey          string `env:"ILLA_SECRET_KEY" 			   envDefault:"8xEMrWkBARcDDYQ"`
 	ServeHTTPS         string `env:"ILLA_DEPLOY_SERVE_HTTPS"       envDefault:"false"`
 
 	// storage config
@@ -45,7 +63,7 @@ type Config struct {
 	DriveUploadTimeout    time.Duration
 }
 
-func GetConfig() (*Config, error) {
+func getConfig() (*Config, error) {
 	// fetch
 	cfg := &Config{}
 	err := env.Parse(cfg)
@@ -84,6 +102,10 @@ func (c *Config) IsServeHTTPS() bool {
 		return true
 	}
 	return false
+}
+
+func (c *Config) GetSecretKey() string {
+	return c.SecretKey
 }
 
 func (c *Config) GetServeHTTPAddress() string {

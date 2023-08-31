@@ -3,11 +3,11 @@ package model
 import (
 	"fmt"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
 )
 
 type AuthClaims struct {
@@ -28,7 +28,8 @@ func ValidateAccessToken(accessToken string) (bool, error) {
 func ExtractUserIDFromToken(accessToken string) (int, uuid.UUID, error) {
 	authClaims := &AuthClaims{}
 	token, err := jwt.ParseWithClaims(accessToken, authClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("ILLA_SECRET_KEY")), nil
+		conf := config.GetInstance()
+		return []byte(conf.GetSecretKey()), nil
 	})
 	if err != nil {
 		return 0, uuid.Nil, err
@@ -59,8 +60,8 @@ func CreateAccessToken(id int, uid uuid.UUID) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	accessToken, err := token.SignedString([]byte(os.Getenv("ILLA_SECRET_KEY")))
+	conf := config.GetInstance()
+	accessToken, err := token.SignedString([]byte(conf.GetSecretKey()))
 	if err != nil {
 		return "", err
 	}

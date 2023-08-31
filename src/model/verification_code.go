@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
 )
 
 type VCodeClaims struct {
@@ -39,7 +39,8 @@ func GenerateAndSendVerificationCode(email, usage string) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	codeToken, err := token.SignedString([]byte(os.Getenv("ILLA_SECRET_KEY")))
+	conf := config.GetInstance()
+	codeToken, err := token.SignedString([]byte(conf.GetSecretKey()))
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +51,8 @@ func GenerateAndSendVerificationCode(email, usage string) (string, error) {
 func ValidateVerificationCode(vCode, codeToken, email, usage string) (bool, error) {
 	vCodeClaims := &VCodeClaims{}
 	token, err := jwt.ParseWithClaims(codeToken, vCodeClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("ILLA_SECRET_KEY")), nil
+		conf := config.GetInstance()
+		return []byte(conf.GetSecretKey()), nil
 	})
 	if err != nil {
 		return false, err

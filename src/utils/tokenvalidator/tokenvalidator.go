@@ -6,31 +6,17 @@ import (
 
 	"crypto/md5"
 
-	"github.com/caarlos0/env"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
 )
 
-type Config struct {
-	Secret string `env:"ILLA_SECRET_KEY" envDefault:""`
-}
-
-func GetConfig() (*Config, error) {
-	cfg := &Config{}
-	err := env.Parse(cfg)
-	return cfg, err
-}
-
 type RequestTokenValidator struct {
-	Config *Config
+	Config *config.Config
 }
 
-func NewRequestTokenValidator() (*RequestTokenValidator, error) {
-	cfg, err := GetConfig()
-	if err != nil {
-		panic("this environment param ILLA_SECRET_KEY must be setted.")
-	}
+func NewRequestTokenValidator() *RequestTokenValidator {
 	return &RequestTokenValidator{
-		Config: cfg,
-	}, nil
+		Config: config.GetInstance(),
+	}
 }
 
 func (r *RequestTokenValidator) GenerateValidateToken(input ...string) string {
@@ -43,7 +29,7 @@ func (r *RequestTokenValidator) GenerateValidateTokenBySliceParam(input []string
 	for _, str := range input {
 		concatr += str
 	}
-	concatr += r.Config.Secret
+	concatr += r.Config.GetSecretKey()
 	hash := md5.Sum([]byte(concatr))
 	var hashConverted []byte = hash[:]
 

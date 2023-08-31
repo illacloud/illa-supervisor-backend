@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 
 	"github.com/google/uuid"
+	"github.com/illacloud/illa-supervisor-backend/src/utils/config"
 	"github.com/illacloud/illa-supervisor-backend/src/utils/idconvertor"
 )
 
@@ -139,8 +140,10 @@ func (u *Invite) ExportUID() uuid.UUID {
 
 func (u *Invite) ExportInviteLink() string {
 	template := ""
+	// if client does not pass hosts field, use server address as URI hosts field
 	if u.Hosts == "" {
-		u.Hosts = Config.GetServeHTTPAddress()
+		conf := config.GetInstance()
+		u.Hosts = conf.GetServeHTTPAddress()
 	}
 	template = u.Hosts + INVITE_URI_TEMPLATE
 	return fmt.Sprintf(template, base64.StdEncoding.EncodeToString([]byte(u.UID.String())))
