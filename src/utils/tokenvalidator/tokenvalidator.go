@@ -2,6 +2,7 @@ package tokenvalidator
 
 import (
 	"encoding/base64"
+	"fmt"
 	"sort"
 
 	"crypto/md5"
@@ -30,6 +31,7 @@ func (r *RequestTokenValidator) GenerateValidateTokenBySliceParam(input []string
 		concatr += str
 	}
 	concatr += r.Config.GetSecretKey()
+	fmt.Printf("[DUMP] GenerateValidateTokenBySliceParam r.Config.GetSecretKey(): %+v\n", r.Config.GetSecretKey())
 	hash := md5.Sum([]byte(concatr))
 	var hashConverted []byte = hash[:]
 

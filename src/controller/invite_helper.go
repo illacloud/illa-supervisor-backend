@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/illacloud/illa-supervisor-backend/src/accesscontrol"
 	"github.com/illacloud/illa-supervisor-backend/src/model"
@@ -28,6 +30,7 @@ func (controller *Controller) DoesTeamInvitePermissionWasClosed(c *gin.Context, 
 }
 
 func (controller *Controller) SendInvite(c *gin.Context, invite *model.Invite, team *model.Team, user *model.User, redirectPage string) error {
+	fmt.Printf("[CALL] SendInvite() invite: %+v\n", invite)
 	// email share app invite
 	if invite.IsShareAppInvite() {
 		m := model.NewEmailShareAppMessage(invite, team, user, redirectPage)

@@ -41,17 +41,16 @@ func SendVerificationEmail(email, code, usage string) error {
 }
 
 func SendInviteEmail(m *EmailInviteMessage) error {
-	fmt.Printf("%v\n", m)
+	fmt.Printf("[CALL] SendInviteEmail() m: %v\n", m)
 	payload := m.Export()
 	client := resty.New()
 	resp, err := client.R().
 		SetBody(payload).
 		Post(EMAIL_DELIVER_BASEURL + EMAIL_DELIVER_INVITE_EMAIL)
+	fmt.Printf("response: %+v, err: %+v", resp, err)
 	if resp.StatusCode() != http.StatusOK || err != nil {
-		fmt.Printf("response: %+v, err: %+v", resp, err)
 		return errors.New("failed to send invite email")
 	}
-	fmt.Printf("response: %+v, err: %+v", resp, err)
 	return nil
 }
 
