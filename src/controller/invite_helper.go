@@ -36,7 +36,7 @@ func (controller *Controller) SendInvite(c *gin.Context, invite *model.Invite, t
 		errInSendEmail := model.SendShareAppEmail(m)
 		if errInSendEmail != nil {
 			invite.SetEmailStatusFailed()
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_SEND_EMAIL_FAILED, "send invite email failed."+errInSendEmail.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_SEND_EMAIL_FAILED, "send invite email failed."+errInSendEmail.Error())
 			return errInSendEmail
 		}
 		return nil
@@ -49,7 +49,7 @@ func (controller *Controller) SendInvite(c *gin.Context, invite *model.Invite, t
 	errInSendEmail := model.SendInviteEmail(m)
 	if errInSendEmail != nil {
 		invite.SetEmailStatusFailed()
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_SEND_EMAIL_FAILED, "send invite email failed."+errInSendEmail.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SEND_EMAIL_FAILED, "send invite email failed."+errInSendEmail.Error())
 		return errInSendEmail
 	}
 	return nil
@@ -58,7 +58,7 @@ func (controller *Controller) SendInvite(c *gin.Context, invite *model.Invite, t
 func (controller *Controller) StorageInvite(c *gin.Context, invite *model.Invite) error {
 	_, errInCreateInvite := controller.Storage.InviteStorage.Create(invite)
 	if errInCreateInvite != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CREATE_LINK_FAILED, "create invite link error: "+errInCreateInvite.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CREATE_LINK_FAILED, "create invite link error: "+errInCreateInvite.Error())
 		return errInCreateInvite
 	}
 	return nil
@@ -68,7 +68,7 @@ func (controller *Controller) UpdateInvite(c *gin.Context, invite *model.Invite)
 	invite.InitUpdatedAt()
 	errInUpdateInvite := controller.Storage.InviteStorage.Update(invite)
 	if errInUpdateInvite != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_INVITE, "update exists invite record failed: "+errInUpdateInvite.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_INVITE, "update exists invite record failed: "+errInUpdateInvite.Error())
 		return errInUpdateInvite
 	}
 	return nil
@@ -78,7 +78,7 @@ func (controller *Controller) UpdateTeamMember(c *gin.Context, teamMember *model
 	teamMember.InitUpdatedAt()
 	errInUpdateTeamMember := controller.Storage.TeamMemberStorage.Update(teamMember)
 	if errInUpdateTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM_MEMBER, "update team member record failed: "+errInUpdateTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM_MEMBER, "update team member record failed: "+errInUpdateTeamMember.Error())
 		return errInUpdateTeamMember
 	}
 	return nil
@@ -87,7 +87,7 @@ func (controller *Controller) UpdateTeamMember(c *gin.Context, teamMember *model
 func (controller *Controller) DeleteOldInvite(c *gin.Context, invite *model.Invite) error {
 	errInDeleteInvite := controller.Storage.InviteStorage.DeleteByID(invite.ExportID())
 	if errInDeleteInvite != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_DELETE_INVITE, "remove old invite link error: "+errInDeleteInvite.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_DELETE_INVITE, "remove old invite link error: "+errInDeleteInvite.Error())
 		return errInDeleteInvite
 	}
 	return nil
@@ -97,7 +97,7 @@ func (controller *Controller) StorageTeamMemberByEmailInvite(c *gin.Context, inv
 	newTeamMember := model.NewPendingTeamMemberByInvite(invite)
 	teamMemberID, errInCreateTeamMember := controller.Storage.TeamMemberStorage.Create(newTeamMember)
 	if errInCreateTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_INVITE, "create invite link error: "+errInCreateTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_INVITE, "create invite link error: "+errInCreateTeamMember.Error())
 		return errInCreateTeamMember
 	}
 	invite.SetTeamMemberID(teamMemberID)

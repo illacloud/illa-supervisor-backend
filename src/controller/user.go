@@ -30,7 +30,7 @@ func (controller *Controller) GetVerificationCode(c *gin.Context) {
 
 	vToken, err := model.GenerateAndSendVerificationCode(req.Email, req.Usage)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_SEND_VERIFICATION_CODE_FAILED, "send verification code error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SEND_VERIFICATION_CODE_FAILED, "send verification code error: "+err.Error())
 		return
 	}
 
@@ -150,7 +150,7 @@ func (controller *Controller) signUpWithEmailToken(req *model.SignUpRequest, inv
 	}
 	newUserIDInt, errInCreateUser := controller.Storage.UserStorage.Create(user)
 	if errInCreateUser != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_USER, "create user error: "+errInCreateUser.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_USER, "create user error: "+errInCreateUser.Error())
 		return
 	}
 	if !req.IsSubscribed {
@@ -161,13 +161,13 @@ func (controller *Controller) signUpWithEmailToken(req *model.SignUpRequest, inv
 	// update team member
 	pendingTeamMember, errInFetchPendingTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndID(inviteRecord.ExportTeamID(), inviteRecord.ExportTeamMemberID())
 	if errInFetchPendingTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "fetch pending team member record error: "+errInFetchPendingTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "fetch pending team member record error: "+errInFetchPendingTeamMember.Error())
 		return
 	}
 	pendingTeamMember.SetUserID(user.ExportID())
 	pendingTeamMember.ActiveUser()
 	if err := controller.Storage.TeamMemberStorage.Update(pendingTeamMember); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM_MEMBER, "update pending team member info error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM_MEMBER, "update pending team member info error: "+err.Error())
 		return
 	}
 
@@ -200,7 +200,7 @@ func (controller *Controller) signUpWithLinkToken(req *model.SignUpRequest, invi
 	// get team by id
 	team, err := controller.Storage.TeamStorage.RetrieveByID(inviteRecord.ExportTeamID())
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
 		return
 	}
 
@@ -219,7 +219,7 @@ func (controller *Controller) signUpWithLinkToken(req *model.SignUpRequest, invi
 	}
 	newUserIDInt, errInCreateUser := controller.Storage.UserStorage.Create(user)
 	if errInCreateUser != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_USER, "create user error: "+errInCreateUser.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_USER, "create user error: "+errInCreateUser.Error())
 		return
 	}
 	if !req.IsSubscribed {
@@ -230,7 +230,7 @@ func (controller *Controller) signUpWithLinkToken(req *model.SignUpRequest, invi
 	// let user join the new team
 	teamMember := model.NewTeamMemberByInviteAndUserID(inviteRecord, newUserIDInt)
 	if _, err := controller.Storage.TeamMemberStorage.Create(teamMember); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_TEAM_MEMBER, "create team member error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_TEAM_MEMBER, "create team member error: "+err.Error())
 		return
 	}
 
@@ -386,12 +386,12 @@ func (controller *Controller) ForgetPassword(c *gin.Context) {
 	// update password
 	hashPwd, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_GENERATE_PASSWORD_FAILED, "generate password error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_GENERATE_PASSWORD_FAILED, "generate password error: "+err.Error())
 		return
 	}
 	user.SetPasswordByByte(hashPwd)
 	if err := controller.Storage.UserStorage.UpdateByID(user); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update user password error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update user password error: "+err.Error())
 		return
 	}
 
@@ -444,7 +444,7 @@ func (controller *Controller) GetUserAvatarUploadAddress(c *gin.Context) {
 	systemDrive.SetUser(user)
 	resignedURL, errInGetPreSignedURL := systemDrive.GetUserAvatarUploadPreSignedURL(fileName)
 	if errInGetPreSignedURL != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CREATE_UPLOAD_URL_FAILED, "get upload URL failed: "+errInGetPreSignedURL.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CREATE_UPLOAD_URL_FAILED, "get upload URL failed: "+errInGetPreSignedURL.Error())
 		return
 	}
 
@@ -475,14 +475,14 @@ func (controller *Controller) UpdateNickname(c *gin.Context) {
 	}
 	user, err := controller.Storage.UserStorage.RetrieveByID(userID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
 		return
 	}
 
 	// update user Nickname
 	user.SetNickname(req.Nickname)
 	if err := controller.Storage.UserStorage.UpdateByID(user); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update user error: "+err.Error())
 		return
 	}
 
@@ -513,14 +513,14 @@ func (controller *Controller) UpdateAvatar(c *gin.Context) {
 	}
 	user, err := controller.Storage.UserStorage.RetrieveByID(userID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
 		return
 	}
 
 	// update user Nickname
 	user.SetAvatar(req.Avatar)
 	if err := controller.Storage.UserStorage.UpdateByID(user); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update user error: "+err.Error())
 		return
 	}
 
@@ -551,7 +551,7 @@ func (controller *Controller) UpdatePassword(c *gin.Context) {
 	}
 	user, err := controller.Storage.UserStorage.RetrieveByID(userID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
 		return
 	}
 
@@ -564,12 +564,12 @@ func (controller *Controller) UpdatePassword(c *gin.Context) {
 	// update password
 	hashPwd, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_GENERATE_PASSWORD_FAILED, "generate password error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_GENERATE_PASSWORD_FAILED, "generate password error: "+err.Error())
 		return
 	}
 	user.SetPasswordByByte(hashPwd)
 	if err := controller.Storage.UserStorage.UpdateByID(user); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update password error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update password error: "+err.Error())
 		return
 	}
 
@@ -600,14 +600,14 @@ func (controller *Controller) UpdateLanguage(c *gin.Context) {
 	}
 	user, err := controller.Storage.UserStorage.RetrieveByID(userID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
 		return
 	}
 
 	// update user language
 	user.SetLanguage(req.Language)
 	if err := controller.Storage.UserStorage.UpdateByID(user); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update language error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update language error: "+err.Error())
 		return
 	}
 
@@ -638,14 +638,14 @@ func (controller *Controller) UpdateIsTutorialViewed(c *gin.Context) {
 	}
 	user, err := controller.Storage.UserStorage.RetrieveByID(userID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
 		return
 	}
 
 	// update user language
 	user.SetIsTutorialViewed(req.IsTutorialViewed)
 	if err := controller.Storage.UserStorage.UpdateByID(user); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update isTutorialViewed error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_USER, "update isTutorialViewed error: "+err.Error())
 		return
 	}
 
@@ -673,7 +673,7 @@ func (controller *Controller) CreateUser(c *gin.Context) {
 	User := model.NewUserByCreateUserRequest(CreateUserRequest)
 	userID, err := controller.Storage.UserStorage.Create(User)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_USER, "create user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_USER, "create user error: "+err.Error())
 		return
 	}
 
@@ -692,7 +692,7 @@ func (controller *Controller) RetrieveUserByID(c *gin.Context) {
 	// retrieve
 	user, err := controller.Storage.UserStorage.RetrieveByID(userID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get user error: "+err.Error())
 		return
 	}
 
@@ -722,14 +722,14 @@ func (controller *Controller) DeleteUser(c *gin.Context) {
 	// delete
 	errInDeleteUser := controller.Storage.UserStorage.DeleteByID(userID)
 	if errInDeleteUser != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_DELETE_USER, "delete user by id error: "+errInDeleteUser.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_DELETE_USER, "delete user by id error: "+errInDeleteUser.Error())
 		return
 	}
 
 	// delete from team member
 	errInDeleteTeamMember := controller.Storage.TeamMemberStorage.DeleteByUserID(userID)
 	if errInDeleteTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_DELETE_TEAM_MEMBER, "delete user from team member by user id error: "+errInDeleteTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_DELETE_TEAM_MEMBER, "delete user from team member by user id error: "+errInDeleteTeamMember.Error())
 		return
 	}
 

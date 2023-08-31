@@ -94,7 +94,7 @@ func (controller *Controller) CanAccess(c *gin.Context) {
 	if userID != model.USER_ROLE_ANONYMOUS {
 		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 		if errInRetrieveTeamMember != nil {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
 			return
 		}
 		teamMemberRole = teamMember.ExportUserRole()
@@ -148,7 +148,7 @@ func (controller *Controller) CanManage(c *gin.Context) {
 	if userID != model.USER_ROLE_ANONYMOUS {
 		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 		if errInRetrieveTeamMember != nil {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
 			return
 		}
 		teamMemberRole = teamMember.ExportUserRole()
@@ -202,7 +202,7 @@ func (controller *Controller) CanManageSpecial(c *gin.Context) {
 	if userID != model.USER_ROLE_ANONYMOUS {
 		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 		if errInRetrieveTeamMember != nil {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
 			return
 		}
 		teamMemberRole = teamMember.ExportUserRole()
@@ -260,7 +260,7 @@ func (controller *Controller) CanModify(c *gin.Context) {
 	if userID != model.USER_ROLE_ANONYMOUS {
 		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 		if errInRetrieveTeamMember != nil {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
 			return
 		}
 		teamMemberRole = teamMember.ExportUserRole()
@@ -314,7 +314,7 @@ func (controller *Controller) CanDelete(c *gin.Context) {
 	if userID != model.USER_ROLE_ANONYMOUS {
 		teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 		if errInRetrieveTeamMember != nil {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
 			return
 		}
 		teamMemberRole = teamMember.ExportUserRole()

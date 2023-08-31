@@ -54,7 +54,7 @@ func (controller *Controller) UpdateTeamConfig(c *gin.Context) {
 	// validate user
 	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "please make sure that your can access this team. retrieve team member error: "+errInRetrieveTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "please make sure that your can access this team. retrieve team member error: "+errInRetrieveTeamMember.Error())
 		return
 	}
 
@@ -68,20 +68,20 @@ func (controller *Controller) UpdateTeamConfig(c *gin.Context) {
 	// get team by id
 	team, err := controller.Storage.TeamStorage.RetrieveByID(teamID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
 		return
 	}
 
 	// update team config
 	errInConstructRawConfig := team.UpdateByUpdateTeamConfigRawRequest(rawRequest)
 	if errInConstructRawConfig != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_BUILD_TEAM_CONFIG_FAILED, "build team config error: "+errInConstructRawConfig.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_BUILD_TEAM_CONFIG_FAILED, "build team config error: "+errInConstructRawConfig.Error())
 		return
 	}
 
 	// update
 	if err := controller.Storage.TeamStorage.UpdateByID(team); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM, "update team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM, "update team error: "+err.Error())
 		return
 	}
 
@@ -108,7 +108,7 @@ func (controller *Controller) UpdateTeamPermission(c *gin.Context) {
 	// validate user
 	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "please make sure that your can access this team. retrieve team member error: "+errInRetrieveTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "please make sure that your can access this team. retrieve team member error: "+errInRetrieveTeamMember.Error())
 		return
 	}
 
@@ -122,18 +122,18 @@ func (controller *Controller) UpdateTeamPermission(c *gin.Context) {
 	// get team by id
 	team, err := controller.Storage.TeamStorage.RetrieveByID(teamID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
 		return
 	}
 
 	// update team permission
 	errInParseRawReq := team.UpdateByUpdateTeamPermissionRawRequest(rawRequest)
 	if errInParseRawReq != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_BUILD_TEAM_PERMISSION_FAILED, "build team permission error: "+errInParseRawReq.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_BUILD_TEAM_PERMISSION_FAILED, "build team permission error: "+errInParseRawReq.Error())
 		return
 	}
 	if err := controller.Storage.TeamStorage.UpdateByID(team); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM, "update team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM, "update team error: "+err.Error())
 		return
 	}
 

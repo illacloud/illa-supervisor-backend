@@ -38,7 +38,7 @@ func (controller *Controller) GetAllTeamMember(c *gin.Context) {
 	// get team by id
 	teamMembers, err := controller.Storage.TeamMemberStorage.RetrieveByTeamID(teamID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get team members error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get team members error: "+err.Error())
 		return
 	}
 
@@ -46,7 +46,7 @@ func (controller *Controller) GetAllTeamMember(c *gin.Context) {
 	userIDs := model.PickUpUserIDsInUserMembers(teamMembers)
 	users, err := controller.Storage.UserStorage.RetrieveByIDs(userIDs)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get team members detail error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get team members detail error: "+err.Error())
 		return
 	}
 
@@ -58,7 +58,7 @@ func (controller *Controller) GetAllTeamMember(c *gin.Context) {
 	inviteForExportLT := model.BuildLookUpTableForInvitesExport(invites)
 	teamMembersForExport, err := controller.assembleTeamMembers(teamMembers, userForExportLT, inviteForExportLT)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_BUILD_TEAM_MEMBER_LIST_FAILED, "build team members list error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_BUILD_TEAM_MEMBER_LIST_FAILED, "build team members list error: "+err.Error())
 		return
 	}
 
@@ -119,7 +119,7 @@ func (controller *Controller) GetTeamMember(c *gin.Context) {
 	// validate user
 	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
 		return
 	}
 
@@ -133,14 +133,14 @@ func (controller *Controller) GetTeamMember(c *gin.Context) {
 	// get target team member by id
 	targetTeamMember, errInRetrieveTargetTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, targetUserID)
 	if errInRetrieveTargetTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTargetTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTargetTeamMember.Error())
 		return
 	}
 
 	// get team members detail info
 	user, err := controller.Storage.UserStorage.RetrieveByID(targetUserID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "get team members detail error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "get team members detail error: "+err.Error())
 		return
 	}
 
@@ -185,14 +185,14 @@ func (controller *Controller) UpdateTeamMemberRole(c *gin.Context) {
 	// get team member
 	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
 		return
 	}
 
 	// check if editor and viewer can manage team member in this team
 	team, errInRetrieveTeam := controller.Storage.TeamStorage.RetrieveByID(teamID)
 	if errInRetrieveTeam != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "retrieve team error: "+errInRetrieveTeam.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "retrieve team error: "+errInRetrieveTeam.Error())
 		return
 	}
 	tp := team.ExportTeamPermission()
@@ -212,7 +212,7 @@ func (controller *Controller) UpdateTeamMemberRole(c *gin.Context) {
 	// get target team member
 	targetTeamMember, errInRetrieveTargetTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndID(teamID, targetTeamMemberID)
 	if errInRetrieveTargetTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get target team member error: "+errInRetrieveTargetTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get target team member error: "+errInRetrieveTargetTeamMember.Error())
 		return
 	}
 
@@ -258,7 +258,7 @@ func (controller *Controller) UpdateTeamMemberRole(c *gin.Context) {
 	// update target teammeber
 	targetTeamMember.UpdateByUpdateTeamMemberRoleRequest(req)
 	if err := controller.Storage.TeamMemberStorage.Update(targetTeamMember); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM_MEMBER, "update target team member error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM_MEMBER, "update target team member error: "+err.Error())
 		return
 	}
 
@@ -273,7 +273,7 @@ func (controller *Controller) UpdateTeamMemberRole(c *gin.Context) {
 	// update owner when needed
 	if req.IsTransferOwner() {
 		if err := controller.Storage.TeamMemberStorage.Update(teamMember); err != nil {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM_MEMBER, "update team member error: "+err.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM_MEMBER, "update team member error: "+err.Error())
 			return
 		}
 	}
@@ -304,14 +304,14 @@ func (controller *Controller) RemoveTeamMember(c *gin.Context) {
 	// validate user
 	teamMember, errInRetrieveTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 	if errInRetrieveTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "retrieve team member error: "+errInRetrieveTeamMember.Error())
 		return
 	}
 
 	// get target team member
 	targetTeamMember, errInRetrieveTargetTeamMember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndID(teamID, targetTeamMemberID)
 	if errInRetrieveTargetTeamMember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get target team member error: "+errInRetrieveTargetTeamMember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get target team member error: "+errInRetrieveTargetTeamMember.Error())
 		return
 	}
 
@@ -331,7 +331,7 @@ func (controller *Controller) RemoveTeamMember(c *gin.Context) {
 	// remove user from the team
 	errInDelete := controller.Storage.TeamMemberStorage.DeleteByIDAndTeamID(targetTeamMemberID, teamID)
 	if errInDelete != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_DELETE_TEAM_MEMBER, "delete team member by team id and user id error: "+errInDelete.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_DELETE_TEAM_MEMBER, "delete team member by team id and user id error: "+errInDelete.Error())
 		return
 	}
 
