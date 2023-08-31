@@ -78,7 +78,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 	// get teamMember (now user role)
 	teamMember, errFetchTeamember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 	if errFetchTeamember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get team member error: "+errFetchTeamember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get team member error: "+errFetchTeamember.Error())
 		return
 	}
 
@@ -96,7 +96,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 	// get team
 	team, err := controller.Storage.TeamStorage.RetrieveByID(teamID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
 		return
 	}
 
@@ -108,7 +108,7 @@ func (controller *Controller) InviteMemberByEmail(c *gin.Context) {
 	// get user
 	user, errInFetchUser := controller.Storage.UserStorage.RetrieveByID(userID)
 	if errInFetchUser != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "fetch user error: "+errInFetchUser.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "fetch user error: "+errInFetchUser.Error())
 		return
 	}
 
@@ -254,7 +254,7 @@ func (controller *Controller) GenerateInviteLink(c *gin.Context) {
 	// get team by id
 	team, err := controller.Storage.TeamStorage.RetrieveByID(teamID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
 		return
 	}
 
@@ -338,7 +338,7 @@ func (controller *Controller) RenewInviteLink(c *gin.Context) {
 	// get now user role
 	teamMember, errFetchTeamember := controller.Storage.TeamMemberStorage.RetrieveByTeamIDAndUserID(teamID, userID)
 	if errFetchTeamember != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get team member error: "+errFetchTeamember.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM_MEMBER, "get team member error: "+errFetchTeamember.Error())
 		return
 	}
 
@@ -355,7 +355,7 @@ func (controller *Controller) RenewInviteLink(c *gin.Context) {
 	// get team by id
 	team, err := controller.Storage.TeamStorage.RetrieveByID(teamID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
 		return
 	}
 
@@ -441,14 +441,14 @@ func (controller *Controller) ConfigInviteLink(c *gin.Context) {
 	// get team by id
 	team, err := controller.Storage.TeamStorage.RetrieveByID(teamID)
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
 		return
 	}
 
 	// update team permission config
 	team.ConfigInviteLinkByRequest(req)
 	if err := controller.Storage.TeamStorage.UpdateByID(team); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM, "update team invite permission error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_TEAM, "update team invite permission error: "+err.Error())
 		return
 	}
 
@@ -493,21 +493,21 @@ func (controller *Controller) JoinByLink(c *gin.Context) {
 	// get user
 	user, errInFetchUser := controller.Storage.UserStorage.RetrieveByID(userID)
 	if errInFetchUser != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_USER, "fetch user error: "+errInFetchUser.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_USER, "fetch user error: "+errInFetchUser.Error())
 		return
 	}
 
 	// fetch invite record from storage
 	inviteRecord, errFetchInvite := controller.Storage.InviteStorage.RetrieveByUID(invite.ExportUID())
 	if errFetchInvite != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_INVITE, "fetch invite error: "+errFetchInvite.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_INVITE, "fetch invite error: "+errFetchInvite.Error())
 		return
 	}
 
 	// check if now user email does not match invte email
 	if inviteRecord.IsEmailInviteLink() {
 		if inviteRecord.ExportEmail() != user.ExportEmail() {
-			controller.FeedbackInternalServerError(c, ERROR_FLAG_INVITE_EMAIL_MISMATCH, "invite email mismatch.")
+			controller.FeedbackBadRequest(c, ERROR_FLAG_INVITE_EMAIL_MISMATCH, "invite email mismatch.")
 			return
 		}
 	}
@@ -515,7 +515,7 @@ func (controller *Controller) JoinByLink(c *gin.Context) {
 	// get team
 	team, err := controller.Storage.TeamStorage.RetrieveByID(inviteRecord.ExportTeamID())
 	if err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_TEAM, "get team error: "+err.Error())
 		return
 	}
 
@@ -532,7 +532,7 @@ func (controller *Controller) JoinByLink(c *gin.Context) {
 	// check if now user already in team
 	userExists, errInCheckUserInTeam := controller.Storage.TeamMemberStorage.DoesTeamIncludedTargetUser(inviteRecord.ExportTeamID(), userID)
 	if errInCheckUserInTeam != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CHECK_TEAM_MEMBER, "check team member error: "+errInCheckUserInTeam.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CHECK_TEAM_MEMBER, "check team member error: "+errInCheckUserInTeam.Error())
 		return
 	}
 	if userExists {
@@ -543,7 +543,7 @@ func (controller *Controller) JoinByLink(c *gin.Context) {
 	// let user join the new team
 	teamMember := model.NewTeamMemberByInviteAndUserID(inviteRecord, userID)
 	if _, err := controller.Storage.TeamMemberStorage.Create(teamMember); err != nil {
-		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAN_NOT_CREATE_TEAM_MEMBER, "create team member error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_TEAM_MEMBER, "create team member error: "+err.Error())
 		return
 	}
 
