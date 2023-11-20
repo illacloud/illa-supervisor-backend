@@ -51,8 +51,7 @@ jobs:
           docker push illasoft/illa-builder:${IMAGE_TAG}
 
       - name: Release Docker image
-        if: github.event_name == 'release' &&
-          startsWith(github.event.release.tag_name, 'illa-supervisor-backend v')
+        if: github.event_name == 'release'
         run: |
           docker tag illasoft/illa-builder:${IMAGE_TAG} illasoft/illa-builder:latest
           docker push illasoft/illa-builder:latest
