@@ -34,8 +34,15 @@ func (controller *Controller) GetVerificationCode(c *gin.Context) {
 		return
 	}
 
+	// cache token
+	errInCacheJWTToken := controller.Cache.JWTCache.SetTokenForEmail(req.Email, vToken)
+	if errInCacheJWTToken != nil {
+		controller.FeedbackInternalServerError(c, ERROR_FLAG_CAHCE_JWT_TOKEN_FAILED, "cache jwt token failed error: "+errInCacheJWTToken.Error())
+		return
+	}
+
 	// feedback
-	controller.FeedbackOK(c, model.NewGetVerificationCodeResponse(vToken))
+	controller.FeedbackOK(c, nil)
 	return
 }
 
@@ -62,6 +69,14 @@ func (controller *Controller) SignUp(c *gin.Context) {
 	validate := validator.New()
 	if err := validate.Struct(req); err != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_BODY_FAILED, "validate request body error: "+err.Error())
+		return
+	}
+
+	// fetch verification token from cache
+	var errInFetchJWTToken error
+	req.VerificationToken, errInFetchJWTToken = controller.Cache.JWTCache.GetTokenByEmail(req.Email)
+	if errInFetchJWTToken != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_FETCH_JWT_TOKEN_FROM_CACHE, "fetch jwt token from cache failed: "+errInFetchJWTToken.Error())
 		return
 	}
 
@@ -365,6 +380,14 @@ func (controller *Controller) ForgetPassword(c *gin.Context) {
 	validate := validator.New()
 	if err := validate.Struct(req); err != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_PARSE_REQUEST_BODY_FAILED, "parse request body error: "+err.Error())
+		return
+	}
+
+	// fetch verification token from cache
+	var errInFetchJWTToken error
+	req.VerificationToken, errInFetchJWTToken = controller.Cache.JWTCache.GetTokenByEmail(req.Email)
+	if errInFetchJWTToken != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_FETCH_JWT_TOKEN_FROM_CACHE, "fetch jwt token from cache failed: "+errInFetchJWTToken.Error())
 		return
 	}
 
