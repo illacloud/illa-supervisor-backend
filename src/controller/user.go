@@ -72,14 +72,6 @@ func (controller *Controller) SignUp(c *gin.Context) {
 		return
 	}
 
-	// fetch verification token from cache
-	var errInFetchJWTToken error
-	req.VerificationToken, errInFetchJWTToken = controller.Cache.JWTCache.GetTokenByEmail(req.Email)
-	if errInFetchJWTToken != nil {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_FETCH_JWT_TOKEN_FROM_CACHE, "fetch jwt token from cache failed: "+errInFetchJWTToken.Error())
-		return
-	}
-
 	// check if team setting `blockRegister` is true
 	team, errInGetTeam := controller.Storage.TeamStorage.RetrieveByID(DEFAULT_TEAM_ID)
 	if errInGetTeam != nil {
