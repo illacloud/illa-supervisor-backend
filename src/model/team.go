@@ -174,13 +174,6 @@ func (u *Team) SetTeamPermission(tp *TeamPermission) {
 	u.InitUpdatedAt()
 }
 
-func (u *Team) ConfigInviteLinkByRequest(req *ConfigInviteLinkRequest) {
-	tp := u.ExportTeamPermission()
-	tp.InviteLinkEnabled = req.InviteLinkEnabled
-	u.Permission = tp.ExportForTeam()
-	u.InitUpdatedAt()
-}
-
 func (u *Team) ExportTeamPermission() *TeamPermission {
 	tp := &TeamPermission{}
 	json.Unmarshal([]byte(u.Permission), tp)

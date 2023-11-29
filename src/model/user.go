@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const CUSTOMIZATION_LANGUAGE_EN_US = "en-US"
@@ -165,101 +164,6 @@ func (u *User) ExportEmail() string {
 	return u.Email
 }
 
-func NewUserBySignUpRequest(req *SignUpRequest) (*User, error) {
-	user := NewUser()
-	custom := NewUserCustomizationBySignUpRequest(req)
-	ssoc := NewUserSSOConfig()
-	hashPwd, errInBcrypt := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if errInBcrypt != nil {
-		return nil, errInBcrypt
-	}
-	var err error
-	user.Nickname = req.Nickname
-	user.PasswordDigest = string(hashPwd)
-	user.Email = req.Email
-	user.SSOConfig = ssoc.Export()
-	user.Customization, err = custom.Export()
-	if err != nil {
-		return nil, err
-	}
-	user.InitUID()
-	user.InitCreatedAt()
-	user.InitUpdatedAt()
-	return user, nil
-}
-
-func NewUserByCreateUserRequest(req *CreateUserRequest) *User {
-	user := NewUser()
-	user.Nickname = req.Nickname
-	user.PasswordDigest = req.PasswordDigest
-	user.Email = req.Email
-	user.SSOConfig = req.SSOConfig
-	user.Customization = req.Customization
-	user.InitUID()
-	user.InitCreatedAt()
-	user.InitUpdatedAt()
-	return user
-}
-
-func NewPendingUserByInvite(i *Invite) (*User, error) {
-	ssoc := NewUserSSOConfig()
-	uc := NewUserCustomization()
-	var errInExport error
-	user := NewUser()
-	user.Nickname = PENDING_USER_NICKNAME
-	user.PasswordDigest = PENDING_USER_PASSWORDDIGEST
-	user.Email = i.Email
-	user.Avatar = PENDING_USER_AVATAR
-	user.SSOConfig = ssoc.Export()
-	user.Customization, errInExport = uc.Export()
-	if errInExport != nil {
-		return nil, errInExport
-	}
-	user.InitUID()
-	user.InitCreatedAt()
-	user.InitUpdatedAt()
-	return user, nil
-}
-
-func NewPendingUserByInviteForExport(inviteForExport *InviteForExport) (*User, error) {
-	var errInExport error
-	ssoc := NewUserSSOConfig()
-	uc := NewUserCustomization()
-	user := NewUser()
-	user.Nickname = PENDING_USER_NICKNAME
-	user.PasswordDigest = PENDING_USER_PASSWORDDIGEST
-	user.Email = inviteForExport.Email
-	user.Avatar = PENDING_USER_AVATAR
-	user.SSOConfig = ssoc.Export()
-	user.Customization, errInExport = uc.Export()
-	if errInExport != nil {
-		return nil, errInExport
-	}
-	user.InitUID()
-	user.InitCreatedAt()
-	user.InitUpdatedAt()
-	return user, nil
-}
-
-func (u *User) UpdatePendingUserBySignUpRequest(req *SignUpRequest) error {
-	custom := NewUserCustomizationBySignUpRequest(req)
-	ssoc := NewUserSSOConfig()
-	hashPwd, errInBcrypt := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if errInBcrypt != nil {
-		return errInBcrypt
-	}
-	var err error
-	u.Nickname = req.Nickname
-	u.PasswordDigest = string(hashPwd)
-	u.SSOConfig = ssoc.Export()
-	u.Customization, err = custom.Export()
-	if err != nil {
-		return err
-	}
-	u.InitUpdatedAt()
-	return nil
-}
-
 func (u *User) ExportUserCustomization() *UserCustomization {
 	userCustomization := NewUserCustomization()
 	json.Unmarshal([]byte(u.Customization), &userCustomization)
@@ -277,14 +181,6 @@ func NewUserCustomization() *UserCustomization {
 		Language:         CUSTOMIZATION_LANGUAGE_EN_US,
 		IsSubscribed:     false,
 		IsTutorialViewed: false,
-	}
-}
-
-func NewUserCustomizationBySignUpRequest(req *SignUpRequest) *UserCustomization {
-	return &UserCustomization{
-		Language:         req.Language,
-		IsSubscribed:     req.IsSubscribed,
-		IsTutorialViewed: req.IsTutorialViewed,
 	}
 }
 

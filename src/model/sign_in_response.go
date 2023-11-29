@@ -7,7 +7,7 @@ import (
 	"github.com/illacloud/illa-supervisor-backend/src/utils/idconvertor"
 )
 
-type SignUpResponse struct {
+type SignInResponse struct {
 	ID           string    `json:"id"`
 	UID          uuid.UUID `json:"uid"`
 	TeamMemberID string    `json:"teamMemberID"`
@@ -20,9 +20,9 @@ type SignUpResponse struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-func NewSignUpResponse(u *User) *SignUpResponse {
+func NewSignInResponse(u *User) *SignInResponse {
 	customization := u.ExportUserCustomization()
-	resp := &SignUpResponse{
+	resp := &SignInResponse{
 		ID:           idconvertor.ConvertIntToString(u.ID),
 		UID:          u.UID,
 		Nickname:     u.Nickname,
@@ -36,6 +36,6 @@ func NewSignUpResponse(u *User) *SignUpResponse {
 	return resp
 }
 
-func (resp *SignUpResponse) ExportForFeedback() interface{} {
+func (resp *SignInResponse) ExportForFeedback() interface{} {
 	return resp
 }

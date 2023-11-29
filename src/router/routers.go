@@ -24,17 +24,14 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	authRouter := routerGroup.Group("/auth")
 	usersRouter := routerGroup.Group("/users")
 	teamsRouter := routerGroup.Group("/teams")
-	joinRouter := routerGroup.Group("/join")
 	statusRouter := routerGroup.Group("/status")
 
 	// register auth
 	usersRouter.Use(r.Authenticator.JWTAuth())
 	teamsRouter.Use(r.Authenticator.JWTAuth())
-	joinRouter.Use(r.Authenticator.JWTAuth())
 
 	// auth routers
 	authRouter.POST("/verification", r.Controller.GetVerificationCode)
-	authRouter.POST("/signup", r.Controller.SignUp)
 	authRouter.POST("/signin", r.Controller.SignIn)
 	authRouter.POST("/forgetPassword", r.Controller.ForgetPassword)
 
@@ -53,21 +50,6 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	teamsRouter.GET("/my", r.Controller.GetMyTeams)
 	teamsRouter.PATCH("/:teamID/config", r.Controller.UpdateTeamConfig)
 	teamsRouter.PATCH("/:teamID/permission", r.Controller.UpdateTeamPermission)
-
-	// team members
-	teamsRouter.GET("/:teamID/members", r.Controller.GetAllTeamMember)
-	teamsRouter.GET("/:teamID/users/:targetUserID", r.Controller.GetTeamMember)
-	teamsRouter.PATCH("/:teamID/teamMembers/:targetTeamMemberID/role", r.Controller.UpdateTeamMemberRole)
-	teamsRouter.DELETE("/:teamID/teamMembers/:targetTeamMemberID", r.Controller.RemoveTeamMember)
-
-	// invite routers
-	teamsRouter.PATCH("/:teamID/configInviteLink", r.Controller.ConfigInviteLink)
-	teamsRouter.GET("/:teamID/inviteLink/userRole/:userRole", r.Controller.GenerateInviteLink)
-	teamsRouter.GET("/:teamID/newInviteLink/userRole/:userRole", r.Controller.RenewInviteLink)
-	teamsRouter.POST("/:teamID/inviteByEmail", r.Controller.InviteMemberByEmail)
-
-	// join routers
-	joinRouter.PUT("/:inviteLinkHash", r.Controller.JoinByLink)
 
 	// status router
 	statusRouter.GET("", r.Controller.Status)
